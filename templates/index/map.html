@@ -1,0 +1,63 @@
+{% extends "base.html" %}
+
+{% load leaflet_tags %}
+{% load static %}
+
+{% block content %}
+<form class="form-row" method="POST">
+  {% for field in form %}
+    <div class="col-12 col-lg-3 my-2">
+        {{ field }}
+        <div class="invalid-feedback">1{{ field.errors }}</div>
+    </div>
+  {% endfor %}
+  <div class="col-12 col-lg-3 my-2 text-center">
+    <button class="btn btn-primary" type="submit">Отправить</button>
+  </div>
+</form>
+  {% leaflet_map "index_map" callback="window.map_init_basic" %}
+{% endblock %}
+
+{% block extra_css %}
+  {% leaflet_css plugins="cluster" %}
+  <link rel="stylesheet" href="{% static "style/leaflet.css" %}">
+{% endblock %}
+
+{% block extra_js %}
+  {% leaflet_js plugins="icon,cluster" %}
+  {% if script_url %}
+    <script src="{{ script_url }}" type="text/javascript"></script>
+  {% else %}
+    <script src="{% url 'indexmap_js' 0 0 0 %}" type="text/javascript"></script>
+  {% endif %}
+  <script type="text/javascript">
+    window.addEventListener("map:init", function (e) {
+        var markers = L.markerClusterGroup({
+          showCoverageOnHover: false,
+          maxClusterRadius: 10
+        });
+
+        {% for cat in type_place %}
+        var {{ cat.icon }}_icon = L.icon.mapkey({icon: '{{ cat.icon }}', color: 'black', background:'rgba(255,255,255,0.8)', size:30, hoverScale: 1.1});
+        {% endfor %}
+        var map = e.detail.map;
+
+        function desc_popup(feature) {
+              return '<div class="text-center font-weight-bold h6">' + feature.properties.title + '</div> \
+                      <div class="text-center font-weight-bold"><a href="/place/' + feature.properties.pk + '">Подробности</a></div>'
+            }
+
+        L.geoJSON(place_arr, {
+          pointToLayer: function (feature, latlng) {
+            switch (feature.properties.type_place) {
+              {% for cat in type_place %}
+                case {{ cat.pk }}: return markers.addLayer(L.marker(latlng, { icon: {{ cat.icon }}_icon }).bindPopup(desc_popup(feature)));
+              {% endfor %}
+            }
+          }
+        }).addTo(map);
+
+    }, false);
+
+  </script>
+{% endblock %}

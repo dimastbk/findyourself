@@ -1,0 +1,102 @@
+{% extends "base.html" %}
+{% load leaflet_tags %}
+{% load static %}
+{% block content %}
+<div class="card mt-2" style="overflow: hidden;">
+  <div class="row no-gutters">
+    <div class="col-12 col-lg-8">
+      <div class="card-body">
+        <div class="d-flex justify-content-between align-items-end">
+          <div class="h4 m-0">{{ place.title }}</div>
+          {% if place.get_pretty_coord %}<div class="text-muted m-0" style="font-size: 14px;">{{ place.get_pretty_coord.lon }}, {{ place.get_pretty_coord.lat }}</div>{% endif %}
+        </div>
+        <hr>
+        <div class="row">
+          <div class="col-12 col-lg-6">
+            <p class="card-text">
+              <span>Тип:</span><br>
+              <span class="ml-3">{{ place.type_place.title }}</span>
+            </p>
+            <p class="card-text">
+              <span>Начало маршрута:</span><br>
+              <span class="ml-3">{{ place.city.title }}</span>
+            </p>
+          </div>
+          <div class="col-12 col-lg-6">
+            <p class="card-text">
+              Район:
+              {% for district in place.district.all %}
+                <br><span class="ml-3">{{ district.title }}</span>
+              {% endfor %}
+            </p>
+            <p class="card-text">
+              <span>Регион:</span><br>
+                <span class="ml-3">{{ place.region.title }}</span>
+            </p>
+            <p class="card-text">
+              <span>Скачать все маршруты в формате</span><br>
+                <span class="ml-3"><a href="{% url 'getallroute' place.pk 'gpx' %}">GPX</a>, <a href="{% url 'getallroute' place.pk 'kml' %}">KML</a></span>
+            </p>
+            <p class="card-text">
+              <span>Это место на:</span><br>
+                <span class="ml-3"><a href="https://www.wikidata.org/wiki/Special:GoToLinkedPage/ruwiki/{{ place.wd_id }}">Википедии</a></span>
+            </p>
+          </div>
+        </div>
+        <div class="row justify-content-between align-items-end">
+          <div>
+            {% if place.tags.all %}
+              <p class="card-text text-muted"><small>{% for tag in place.tags.all %}<a href="#" class="">{{ tag }}</a> {% endfor %}</small></p>
+            {% endif %}
+          </div>
+          <div>
+            <p class="card-text text-right text-muted"><small>{{ place.create_date }}</small></p>
+          </div>
+        </div>
+        </div>
+      </div>
+    <div class="col-12 col-lg-4"><img style="width: 100%;" src="{{ place.image.mini }}"></div>
+  </div>
+</div>
+
+<div class="mt-2">
+  {% leaflet_map "minimap" callback="window.map_init_basic" %}
+</div>
+
+{% endblock %}
+{% block extra_css %}
+  {% leaflet_css %}
+  <link rel="stylesheet" href="{% static "style/leaflet.css" %}">
+{% endblock %}
+{% block extra_js %}
+  {% leaflet_js plugins="icon" %}
+  <script type="text/javascript">
+    window.addEventListener("map:init", function (e) {
+
+        var place_icon = L.icon.mapkey({icon: '{{ place.type_place.icon }}', color: 'black', background:'rgba(255,255,255,0.8)', size:30, hoverScale: 1.1}),
+            city_icon = L.icon.mapkey({icon: 'village', color: 'black', background:'rgba(255,255,255,0.8)', size:30, hoverScale: 1.1}),
+            coord_place = {{ place.get_jsoncoord }},
+            coord_city = {{ place.city.get_jsoncoord }},
+            map = e.detail.map.fitBounds([ coord_place, coord_city  ]);
+
+        {% for linestring in place.route_set.all %}
+          L.polyline({{ linestring.get_jsoncoord }}, {color: 'red'}).addTo(map).bindPopup(
+            '<div class="text-center font-weight-bold h6">{{ linestring.rt_title }}</div> \
+            <b>Тип:</b> {{ linestring.get_rt_type_display }}<br> \
+            <b>Начало:</b> {{ linestring.rt_from }}<br> \
+            <b>Длина:</b> {{ linestring.rt_length }} км<br> \
+            <b>Скачать:</b> <a href="{% url 'getroute' linestring.pk 'gpx' %}">GPX</a>, <a href="{% url 'getroute' linestring.pk 'kml' %}">KML</a> \
+            <div class="text-center font-weight-bold"><a href="{% url 'route' linestring.pk %}">Подробности</a></div>'
+            );
+        {% endfor %}
+
+        L.marker( coord_place, { icon: place_icon } ).addTo(map).bindPopup('{{ place.title }}');
+        L.marker( coord_city, { icon: city_icon } ).addTo(map).bindPopup('{{ place.city.title }}');
+
+        {% for district in place.district.all %}
+          L.marker( {{ district.capital.get_jsoncoord }}, { icon: city_icon } ).addTo(map).bindPopup('{{ district.capital.title }}');
+        {% endfor %}
+
+    }, false);
+  </script>
+{% endblock %}

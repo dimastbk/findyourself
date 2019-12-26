@@ -1,0 +1,39 @@
+<!doctype html>
+<html lang="ru">
+  <head>
+    <!-- Required meta tags -->
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+    <!-- Bootstrap CSS -->
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css" integrity="sha384-MCw98/SFnGE8fJT3GXwEOngsV7Zt27NXFoaoApmYm81iuXoPkFOJwJ8ERdknLPMO" crossorigin="anonymous">
+
+    {% block extra_css %}{% endblock %}
+    
+    {% load static %}
+    <link rel="stylesheet" href="{% static 'plugins/icon/MapkeyIcons.css' %}" >
+    <style type="text/css">
+      @font-face {
+        font-family: 'MapkeyIcons';
+        src: url('{% static 'plugins/icon/MapkeyIcons.woff' %}') format('woff');
+        font-weight: normal;
+        font-style: normal;
+      }
+    </style>
+
+    <title>{% if title_page %}{{ title_page }} | {% endif %}{{ title_main }}</title>
+
+  </head>
+  <body>
+    <div class="container">
+      
+      {% include "components/navbar.html" %}
+
+      {% block content %}{% endblock %}
+      
+    </div>
+
+    {% block extra_js %}{% endblock %}
+    
+  </body>
+</html>

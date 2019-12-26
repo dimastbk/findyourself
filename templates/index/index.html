@@ -1,0 +1,13 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="shadow-sm mt-2 p-2">
+  <div class="h4">Последние добавленные места</div>
+  <div class="row mx-2">
+    {% for place in latest_places %}
+      <div class="p-2 col-6 col-lg-2">
+        {% include "./place_mini.html" %}
+      </div>
+    {% endfor %}
+  </div>
+</div>
+{% endblock %}
