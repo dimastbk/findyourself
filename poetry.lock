@@ -683,6 +683,14 @@ python-versions = ">=2.7, !=3.0.*, !=3.1.*, !=3.2.*, !=3.3.*"
 version = "0.3.0"
 
 [[package]]
+category = "main"
+description = "Python parser for the Shuttle Radar Topography Mission elevation data"
+name = "srtm.py"
+optional = false
+python-versions = "*"
+version = "0.3.4"
+
+[[package]]
 category = "dev"
 description = "Manage dynamic plugins for Python applications"
 name = "stevedore"
@@ -786,7 +794,7 @@ docs = ["sphinx", "jaraco.packaging (>=3.2)", "rst.linker (>=1.9)"]
 testing = ["pathlib2", "contextlib2", "unittest2"]
 
 [metadata]
-content-hash = "762a338a18f7581f3f8e8b955148c48b5837fb0a366fc7d23def77578fca26ce"
+content-hash = "5a41addb11129fb4f1dbf77232ef3c70eb9e0581e8c3ef255cb727c5bcd8e2bb"
 python-versions = "^3.7"
 
 [metadata.files]
@@ -1059,6 +1067,9 @@ snowballstemmer = [
 sqlparse = [
     {file = "sqlparse-0.3.0-py2.py3-none-any.whl", hash = "sha256:40afe6b8d4b1117e7dff5504d7a8ce07d9a1b15aeeade8a2d10f130a834f8177"},
     {file = "sqlparse-0.3.0.tar.gz", hash = "sha256:7c3dca29c022744e95b547e867cee89f4fce4373f3549ccd8797d8eb52cdb873"},
+]
+"srtm.py" = [
+    {file = "SRTM.py-0.3.4.tar.gz", hash = "sha256:42cce7a63650963c619c15b749e9d754ad8fa56e277b1529865105275f4e3c9b"},
 ]
 stevedore = [
     {file = "stevedore-1.31.0-py2.py3-none-any.whl", hash = "sha256:01d9f4beecf0fbd070ddb18e5efb10567801ba7ef3ddab0074f54e3cd4e91730"},

@@ -1,6 +1,7 @@
 {% extends "base.html" %}
 {% load leaflet_tags %}
 {% load static %}
+{% load l10n %}
 {% block content %}
 <div class="card mt-2" style="overflow: hidden;">
   <div class="row no-gutters">
@@ -78,6 +79,20 @@
             coord_place = {{ place.get_jsoncoord }},
             coord_city = {{ place.city.get_jsoncoord }},
             map = e.detail.map.fitBounds([ coord_place, coord_city  ]);
+
+        json = fetch('http://127.0.0.1:5000/route/v1/driving/{{ place.city.get_coord.0.0|unlocalize }},{{ place.city.get_coord.0.1|unlocalize }};{{ place.district.all.0.capital.get_coord.0.0|unlocalize }},{{ place.district.all.0.capital.get_coord.0.1|unlocalize }}?geometries=geojson&overview=full')
+          .then(response => response.json())
+          .then(data => data['routes'][0])
+          .then(data => L.polyline(
+            data['geometry']['coordinates'].map(
+              function(el, i, arr) {
+                return  [arr[i][1], arr[i][0]];
+              }), 
+            {color: 'green'}).addTo(map).bindPopup(
+            '<div class="text-center font-weight-bold h6">Из {{ place.district.all.0.capital.title }} до {{ place.city.title }}</div> \
+            <b>Тип:</b> автомобильный<br> \
+            <b>Длина:</b> ' + Math.round(data['distance'] / 10) / 100 + ' км<br>'
+            ))
 
         {% for linestring in place.route_set.all %}
           L.polyline({{ linestring.get_jsoncoord }}, {color: 'red'}).addTo(map).bindPopup(

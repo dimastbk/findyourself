@@ -1,41 +1,10 @@
-import json
-
+import srtm
 from django.contrib.gis.db import models
-from django.contrib.gis.geos import GEOSGeometry
+from django.contrib.gis.geos import LineString
 from imagefield.fields import ImageField
 from taggit.managers import TaggableManager
 
-from .utils import pretty_coord
-
-
-class CoordMixin():
-    @property
-    def get_coord(self):
-        # прямые координаты, используются в KML
-        if getattr(self, 'coord', False):
-            return [(self.coord.x, self.coord.y)]
-        elif getattr(self, 'ls', False):
-            return [(i[0], i[1]) for i in self.ls.coords]
-        return ''
-
-    @property
-    def get_rvcoord(self):
-        # обратные координаты, используются в JS (leaflet)
-        if getattr(self, 'coord', False):
-            return [(self.coord.y, self.coord.x)]
-        elif getattr(self, 'ls', False):
-            return [(i[1], i[0]) for i in self.ls.coords]
-        return ''
-
-    @property
-    def get_jsoncoord(self):
-        # если одна точка, то выдаём только её, иначе список точек
-        return json.dumps(self.get_rvcoord[0] if len(self.get_rvcoord) == 1 else self.get_rvcoord)
-
-    def get_pretty_coord(self):
-        # координаты с с.ш. и в.д.
-        if self.coord:
-            return pretty_coord(self.coord.x, self.coord.y)
+from .mixin import CoordMixin
 
 
 class Place(models.Model, CoordMixin):
@@ -211,12 +180,17 @@ class Route(models.Model, CoordMixin):
         return f'{self.rt_from} - {self.rt_to}'
 
     def save(self, *args, **kwargs):
-        # Вычисляем длину маршрута
-        ls = GEOSGeometry(self.ls, srid=4326)
+        # Добавляем высоту (нужно добавить проверку на её отсутсвие)
+        elevation_data = srtm.get_data()
+        ls = LineString(
+            [(p[0], p[1], elevation_data.get_elevation(p[1], p[0])) for p in self.ls.coords],
+            srid=4326,
+        )
         # считаем зону UTM для корректного расчёта длины
         # ls.centroid.x - долгота центра маршрута
         zone = 32660 - round((177 - ls.centroid.x) / 6)
         ls.transform(zone)
+        # Считаем длину маршрута
         self.rt_length = ls.length / 1000
 
         super().save(*args, **kwargs)
