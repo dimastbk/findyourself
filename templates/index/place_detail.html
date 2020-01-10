@@ -76,11 +76,12 @@
 
         var place_icon = L.icon.mapkey({icon: '{{ place.type_place.icon }}', color: 'black', background:'rgba(255,255,255,0.8)', size:30, hoverScale: 1.1}),
             city_icon = L.icon.mapkey({icon: 'village', color: 'black', background:'rgba(255,255,255,0.8)', size:30, hoverScale: 1.1}),
+            home_icon = L.icon.mapkey({icon: 'home', color: 'black', background:'rgba(255,255,255,0.8)', size:30, hoverScale: 1.1}),
             coord_place = {{ place.get_jsoncoord }},
             coord_city = {{ place.city.get_jsoncoord }},
             map = e.detail.map.fitBounds([ coord_place, coord_city  ]);
-
-        json = fetch('http://127.0.0.1:5000/route/v1/driving/{{ place.city.get_coord.0.0|unlocalize }},{{ place.city.get_coord.0.1|unlocalize }};{{ place.district.all.0.capital.get_coord.0.0|unlocalize }},{{ place.district.all.0.capital.get_coord.0.1|unlocalize }}?geometries=geojson&overview=full')
+        {% if user.is_authenticated %}
+          json = fetch('http://127.0.0.1:5000/route/v1/driving/{{ place.city.get_coord.0.0|unlocalize }},{{ place.city.get_coord.0.1|unlocalize }};{{ user.profile.city.get_coord.0.0|unlocalize }},{{ user.profile.city.get_coord.0.1|unlocalize }}?geometries=geojson&overview=full')
           .then(response => response.json())
           .then(data => data['routes'][0])
           .then(data => L.polyline(
@@ -89,10 +90,11 @@
                 return  [arr[i][1], arr[i][0]];
               }), 
             {color: 'green'}).addTo(map).bindPopup(
-            '<div class="text-center font-weight-bold h6">Из {{ place.district.all.0.capital.title }} до {{ place.city.title }}</div> \
+            '<div class="text-center font-weight-bold h6">Из {{ user.profile.city.title }} до {{ place.city.title }}</div> \
             <b>Тип:</b> автомобильный<br> \
             <b>Длина:</b> ' + Math.round(data['distance'] / 10) / 100 + ' км<br>'
             ))
+        {% endif %}
 
         {% for linestring in place.route_set.all %}
           L.polyline({{ linestring.get_jsoncoord }}, {color: 'red'}).addTo(map).bindPopup(
@@ -105,12 +107,11 @@
             );
         {% endfor %}
 
-        L.marker( coord_place, { icon: place_icon } ).addTo(map).bindPopup('{{ place.title }}');
+        L.marker( coord_place, { icon: place_icon } ).addTo(map).bindPopup('{{ place.title }}').openPopup();
         L.marker( coord_city, { icon: city_icon } ).addTo(map).bindPopup('{{ place.city.title }}');
-
-        {% for district in place.district.all %}
-          L.marker( {{ district.capital.get_jsoncoord }}, { icon: city_icon } ).addTo(map).bindPopup('{{ district.capital.title }}');
-        {% endfor %}
+        {% if user.is_authenticated %}
+        L.marker( {{ user.profile.city.get_jsoncoord }}, { icon: home_icon } ).addTo(map).bindPopup('{{ user.profile.city.title }}');  
+        {% endif %}
 
     }, false);
   </script>

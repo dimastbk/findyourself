@@ -1,0 +1,51 @@
+{% extends "base.html" %}
+
+{% block content %}
+  <div class="card mt-2" style="overflow: hidden;">
+    <div class="row no-gutters">
+      <div class="col-12 col-lg-8">
+        <div class="card-body">
+          <div class="d-flex justify-content-between align-items-end">
+            <div class="h4 m-0">@{{ user.username }}</div>
+          </div>
+          <hr>
+          <div class="row">
+            <div class="col-12 col-lg-6">
+              <p class="card-text">
+                <span>Имя:</span><br>
+                <span class="ml-3">{{ user.first_name }}</span>
+              </p>
+              <p class="card-text">
+                <span>Город:</span><br>
+                <span class="ml-3">{{ user.profile.city.title }}</span>
+              </p>
+            </div>
+            <div class="col-12 col-lg-6">
+              <p class="card-text">
+                <span>Посещено мест:</span><br>
+                  <span class="ml-3">{{ user.places }}</span>
+              </p>
+              <p class="card-text">
+                <span>Проехано:</span><br>
+                  <span class="ml-3">{{ user.length_auto }}</span>
+              </p>
+              <p class="card-text">
+                <span>Пройдено:</span><br>
+                  <span class="ml-3">{{ user.length_hike }}</span>
+              </p>
+              <p class="card-text">
+                <span>Проплыто:</span><br>
+                  <span class="ml-3">{{ user.length_boat }}</span>
+              </p>
+            </div>
+          </div>
+          </div>
+        </div>
+      <div class="col-12 col-lg-4"><img style="width: 100%;" src="{{ user.image }}"></div>
+    </div>
+  </div>
+  {% if request.resolver_match.url_name == 'current_profile' %}
+    <a href="{% url 'user:edit_profile' %}" class="btn btn-success">Редактировать профиль</a>
+  {% endif %}
+{% endblock %}
+

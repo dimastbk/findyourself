@@ -88,6 +88,7 @@ class City(models.Model, CoordMixin):
     class Meta:
         verbose_name = 'Город'
         verbose_name_plural = 'Города'
+        ordering = ['title']
 
     def __str__(self):
         return self.title
@@ -112,6 +113,7 @@ class District(models.Model):
     class Meta:
         verbose_name = 'Район'
         verbose_name_plural = 'Районы'
+        ordering = ['title']
 
     def __str__(self):
         return self.title
@@ -130,6 +132,7 @@ class Region(models.Model):
     class Meta:
         verbose_name = 'Регион'
         verbose_name_plural = 'Регионы'
+        ordering = ['title']
 
     def __str__(self):
         return self.title
