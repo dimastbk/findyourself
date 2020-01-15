@@ -1,3 +1,4 @@
+from django.contrib.auth.mixins import LoginRequiredMixin
 from django.core.serializers import serialize
 from django.http import HttpResponse, HttpResponseBadRequest
 from django.urls import reverse
@@ -33,6 +34,7 @@ class IndexMapJsView(View):
 @method_decorator(csrf_exempt, name='dispatch')
 class IndexMapPageView(FormView):
 
+    title_page = 'Карта'
     template_name = 'index/map.html'
     form_class = IndexMapForm
 
@@ -52,6 +54,7 @@ class IndexMapPageView(FormView):
 
 class IndexPageView(TemplateView):
 
+    title_page = 'Главная'
     template_name = 'index/index.html'
 
     def get_context_data(self, **kwargs):
@@ -71,13 +74,19 @@ class PlaceDetailView(DetailView):
         ).select_related('city', 'type_place').prefetch_related('district', 'route_set')
         return qs
 
+    def title_page(self):
+        return '{0} ({1})'.format(
+            self.get_object().title,
+            self.get_object().type_place.title.lower(),
+        )
+
 
 class RouteDetailView(DetailView):
 
     model = Route
 
 
-class GetRoute(View):
+class GetRoute(LoginRequiredMixin, View):
 
     def get(self, request, *args, **kwargs):
         route = Route.objects.select_related('rt_from', 'rt_to').get(pk=self.kwargs['pk'])
@@ -99,7 +108,7 @@ class GetRoute(View):
         return response
 
 
-class GetAllRoute(View):
+class GetAllRoute(LoginRequiredMixin, View):
 
     def get(self, request, *args, **kwargs):
         routes = Place.objects.filter(

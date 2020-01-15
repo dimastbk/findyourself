@@ -1,6 +1,7 @@
 import srtm
 from django.contrib.gis.db import models
 from django.contrib.gis.geos import LineString
+from django.urls import reverse
 from imagefield.fields import ImageField
 from taggit.managers import TaggableManager
 
@@ -49,6 +50,9 @@ class Place(models.Model, CoordMixin):
 
     def __str__(self):
         return self.title
+
+    def get_absolute_url(self):
+        return reverse('place', kwargs={'pk': self.id})
 
 
 class Type(models.Model):

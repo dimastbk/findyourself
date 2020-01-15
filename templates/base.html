@@ -21,7 +21,7 @@
       }
     </style>
 
-    <title>{% if title_page %}{{ title_page }} | {% endif %}{{ title_main }}</title>
+    <title>{% if view.title_page %}{{ view.title_page }} | {% endif %}{{ request.site.name }}</title>
 
   </head>
   <body>

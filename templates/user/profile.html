@@ -7,6 +7,9 @@
         <div class="card-body">
           <div class="d-flex justify-content-between align-items-end">
             <div class="h4 m-0">@{{ user.username }}</div>
+            {% if request.resolver_match.url_name == 'current_profile' %}
+              <a href="{% url 'user:edit_profile' %}">Редактировать профиль</a>
+            {% endif %}
           </div>
           <hr>
           <div class="row">
@@ -21,31 +24,34 @@
               </p>
             </div>
             <div class="col-12 col-lg-6">
-              <p class="card-text">
-                <span>Посещено мест:</span><br>
-                  <span class="ml-3">{{ user.places }}</span>
-              </p>
+              {% if user.profile.like_place.all %}
+                <p class="card-text">
+                  <span><a href="#likes">В избранном:</a></span><br>
+                    <span class="ml-3">{{ user.profile.like_place.count }}</span>
+                </p>
+              {% endif %}
+              {% if user.profile.done_place.all %}
+                <p class="card-text">
+                  <span><a href="#dones">Посещено:</a></span><br>
+                    <span class="ml-3">{{ user.profile.done_place.count }}</span>
+                </p>
+              {% endif %}
+              {% if user.profile.want_place.all %}
+                <p class="card-text">
+                  <span><a href="#wants">К посещению:</a></span><br>
+                    <span class="ml-3">{{ user.profile.want_place.count }}</span>
+                </p>
+              {% endif %}
               <p class="card-text">
                 <span>Проехано:</span><br>
-                  <span class="ml-3">{{ user.length_auto }}</span>
-              </p>
-              <p class="card-text">
-                <span>Пройдено:</span><br>
-                  <span class="ml-3">{{ user.length_hike }}</span>
-              </p>
-              <p class="card-text">
-                <span>Проплыто:</span><br>
-                  <span class="ml-3">{{ user.length_boat }}</span>
+                  <span class="ml-3">{{ user.profile.length_auto }}</span>
               </p>
             </div>
           </div>
-          </div>
         </div>
-      <div class="col-12 col-lg-4"><img style="width: 100%;" src="{{ user.image }}"></div>
+      </div>
+      <div class="col-12 col-lg-4"><img style="width: 100%;" src="{{ user.profile.image }}"></div>
     </div>
   </div>
-  {% if request.resolver_match.url_name == 'current_profile' %}
-    <a href="{% url 'user:edit_profile' %}" class="btn btn-success">Редактировать профиль</a>
-  {% endif %}
 {% endblock %}
 

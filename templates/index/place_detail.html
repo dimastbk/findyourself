@@ -8,22 +8,32 @@
     <div class="col-12 col-lg-8">
       <div class="card-body">
         <div class="d-flex justify-content-between align-items-end">
-          <div class="h4 m-0">{{ place.title }}</div>
-          {% if place.get_pretty_coord %}<div class="text-muted m-0" style="font-size: 14px;">{{ place.get_pretty_coord.lon }}, {{ place.get_pretty_coord.lat }}</div>{% endif %}
+          <div class="m-0"><small class="text-muted text-lowercase">{{ place.type_place.title }}</small> <span class="h3">{{ place.title }}</span></div>
+          <div>
+            {% if place in user.profile.like_place.all %}
+              <a href="{% url 'action_user_place' place.id 'unlike' %}" class="btn btn-outline-danger mki-grande" title="Удалить из избранного">&#xe08c;</a>
+            {% else %}
+              <a href="{% url 'action_user_place' place.id 'like' %}" class="btn btn-outline-secondary mki-grande" title="Добавить в избранное">&#xe08c;</a>
+            {% endif %}
+            {% if place in user.profile.done_place.all %}
+              <a href="{% url 'action_user_place' place.id 'undone' %}" class="btn btn-outline-success mki-grande" title="Снять отметку о посещении">✔</a>
+            {% else %}
+              <a href="{% url 'action_user_place' place.id 'done' %}" class="btn btn-outline-secondary mki-grande" title="Отметить посещённым">✔</a>
+              {% if place in user.profile.want_place.all %}
+                <a href="{% url 'action_user_place' place.id 'unwant' %}" class="btn btn-outline-warning mki-grande" title="Убрать из хотелок">&#xe07a;</a>
+              {% else %}
+                <a href="{% url 'action_user_place' place.id 'want' %}" class="btn btn-outline-secondary mki-grande" title="Хочу посетить">&#xe07a;</a>
+              {% endif %}
+            {% endif %}
+          </div>
         </div>
         <hr>
         <div class="row">
           <div class="col-12 col-lg-6">
             <p class="card-text">
-              <span>Тип:</span><br>
-              <span class="ml-3">{{ place.type_place.title }}</span>
-            </p>
-            <p class="card-text">
               <span>Начало маршрута:</span><br>
               <span class="ml-3">{{ place.city.title }}</span>
             </p>
-          </div>
-          <div class="col-12 col-lg-6">
             <p class="card-text">
               Район:
               {% for district in place.district.all %}
@@ -34,8 +44,10 @@
               <span>Регион:</span><br>
                 <span class="ml-3">{{ place.region.title }}</span>
             </p>
+          </div>
+          <div class="col-12 col-lg-6">
             <p class="card-text">
-              <span>Скачать все маршруты в формате</span><br>
+              <span>Скачать все треки</span><br>
                 <span class="ml-3"><a href="{% url 'getallroute' place.pk 'gpx' %}">GPX</a>, <a href="{% url 'getallroute' place.pk 'kml' %}">KML</a></span>
             </p>
             <p class="card-text">

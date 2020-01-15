@@ -2,8 +2,9 @@ from django.contrib.auth.models import User
 from django.db import models
 from django.db.models.signals import post_save
 from django.dispatch import receiver
+from django.urls import reverse
 
-from index.models import City
+from index.models import City, Place
 
 
 class Profile(models.Model):
@@ -16,6 +17,24 @@ class Profile(models.Model):
         verbose_name='Населённый пункт',
     )
     instagram = models.CharField(max_length=50, blank=True)
+    like_place = models.ManyToManyField(
+        Place,
+        verbose_name='Избранное',
+        db_table='like_user_place',
+        related_name='like_place',
+    )
+    done_place = models.ManyToManyField(
+        Place,
+        verbose_name='Пройденные места',
+        db_table='done_user_place',
+        related_name='done_place',
+    )
+    want_place = models.ManyToManyField(
+        Place,
+        verbose_name='Планируемые места',
+        db_table='want_user_place',
+        related_name='want_place',
+    )
 
     class Meta:
         verbose_name = 'Профиль'
@@ -23,6 +42,9 @@ class Profile(models.Model):
 
     def __str__(self):
         return self.user.username
+
+    def get_absolute_url(self):
+        return reverse('user:profile', kwargs={'pk': self.id})
 
 
 @receiver(post_save, sender=User)
