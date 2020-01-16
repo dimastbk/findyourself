@@ -34,7 +34,7 @@ class IndexMapJsView(View):
 @method_decorator(csrf_exempt, name='dispatch')
 class IndexMapPageView(FormView):
 
-    title_page = 'Карта'
+    title_page = 'Карта мест'
     template_name = 'index/map.html'
     form_class = IndexMapForm
 
@@ -49,6 +49,26 @@ class IndexMapPageView(FormView):
             'indexmap_js',
             kwargs={k: v or 0 for k, v in form.data.items()},
         )
+        return self.render_to_response(context)
+
+
+@method_decorator(csrf_exempt, name='dispatch')
+class IndexListPageView(FormView):
+
+    title_page = 'Все места'
+    template_name = 'index/list.html'
+    form_class = IndexMapForm
+
+    def get(self, request, *args, **kwargs):
+        context = self.get_context_data()
+        context['place_list'] = Place.objects.all()
+        return self.render_to_response(context)
+
+    def form_valid(self, form):
+        context = self.get_context_data(**{'form': form})
+        query = {k: v for k, v in form.cleaned_data.items() if v is not None}
+        query['is_published'] = True
+        context['place_list'] = Place.objects.filter(**query).all()
         return self.render_to_response(context)
 
 

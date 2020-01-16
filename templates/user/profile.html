@@ -53,5 +53,54 @@
       <div class="col-12 col-lg-4"><img style="width: 100%;" src="{{ user.profile.image }}"></div>
     </div>
   </div>
+  <div class="row">
+    {% if user.profile.like_place.all %}
+    <div class="col-lg-4 p-2">
+      <div id="likes" class="shadow-sm p-2 active-target">
+        <div class="h5">Избранное</div>
+        <div class="row mx-1">
+          {% for place in user.profile.like_place.all %}
+            <div class="p-1 col-2">
+              {% include "./place_mini.html" %}
+            </div>
+          {% endfor %}
+        </div>
+        <p class="text-right small m-0"><a href="{% if request.resolver_match.url_name == 'current_profile' %}{% url 'user:current_user_favor_place' 'likes' %}{% else %}{% url 'user:user_favor_place' user.id 'likes' %}{% endif %}">Весь список ({{ user.profile.like_place.count }}) →</a></p>
+      </div>
+    </div>
+    {% endif %}
+    {% if user.profile.done_place.all %}
+    <div class="col-lg-4 p-2">
+      <div id="dones" class="shadow-sm p-2 active-target">
+        <div class="h5">Посещено</div>
+        <div class="row mx-1">
+          {% for place in user.profile.done_place.all %}
+            <div class="p-1 col-2">
+              {% include "./place_mini.html" %}
+            </div>
+          {% endfor %}
+        </div>
+        <p class="text-right small m-0"><a href="{% if request.resolver_match.url_name == 'current_profile' %}{% url 'user:current_user_favor_place' 'dones' %}{% else %}{% url 'user:user_favor_place' user.id 'dones' %}{% endif %}">Весь список ({{ user.profile.done_place.count }}) →</a></p>
+      </div>
+    </div>
+    {% endif %}
+    {% if user.profile.want_place.all %}
+      <div class="col-lg-4 p-2">
+        <div id="wants" class="shadow-sm p-2 active-target">
+          <div class="h5">К посещению</div>
+          <div class="row mx-1">
+            {% for place in user.profile.want_place.all %}
+              {% if place.is_published %}
+                <div class="p-1 col-2">
+                  {% include "./place_mini.html" %}
+                </div>
+              {% endif %}
+            {% endfor %}
+          </div>
+          <p class="text-right small m-0"><a href="{% if request.resolver_match.url_name == 'current_profile' %}{% url 'user:current_user_favor_place' 'wants' %}{% else %}{% url 'user:user_favor_place' user.id 'wants' %}{% endif %}">Весь список ({{ user.profile.want_place.count }}) →</a></p>
+        </div>
+      </div>
+    {% endif %}
+  </div>
 {% endblock %}
 

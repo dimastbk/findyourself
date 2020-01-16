@@ -1,0 +1,24 @@
+#minimap {
+    width:  100%;
+    height: 400px;
+}
+
+#index_map {
+    width:  100%;
+    height: 800px;
+}
+
+.active-target:target {
+    animation: active-target 2s;
+    background: white;
+}
+
+@keyframes active-target {
+  50% {
+    background: lightgreen;
+  }
+}
+
+.btn-outline-warning:hover {
+    color: white;
+}

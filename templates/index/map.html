@@ -4,23 +4,22 @@
 {% load static %}
 
 {% block content %}
-<form class="form-row" method="POST">
-  {% for field in form %}
-    <div class="col-12 col-lg-3 my-2">
-        {{ field }}
-        <div class="invalid-feedback">1{{ field.errors }}</div>
+  <form class="form-row" method="POST">
+    {% for field in form %}
+      <div class="col-12 col-lg-3 my-2">
+          {{ field }}
+          <div class="invalid-feedback">1{{ field.errors }}</div>
+      </div>
+    {% endfor %}
+    <div class="col-12 col-lg-3 my-2 text-center">
+      <button class="btn btn-primary" type="submit">Найти</button>
     </div>
-  {% endfor %}
-  <div class="col-12 col-lg-3 my-2 text-center">
-    <button class="btn btn-primary" type="submit">Отправить</button>
-  </div>
-</form>
+  </form>
   {% leaflet_map "index_map" callback="window.map_init_basic" %}
 {% endblock %}
 
 {% block extra_css %}
   {% leaflet_css plugins="cluster" %}
-  <link rel="stylesheet" href="{% static "style/leaflet.css" %}">
 {% endblock %}
 
 {% block extra_js %}

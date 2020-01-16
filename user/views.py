@@ -1,10 +1,13 @@
+from django.contrib import messages
 from django.contrib.auth import login, logout
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib.auth.models import User
 from django.contrib.auth.views import LoginView, PasswordChangeView
 from django.contrib.messages.views import SuccessMessageMixin
+from django.http import HttpResponse
 from django.urls import reverse_lazy
 from django.utils.decorators import method_decorator
+from django.utils.http import url_has_allowed_host_and_scheme
 from django.views.decorators.cache import never_cache
 from django.views.decorators.csrf import csrf_protect
 from django.views.decorators.debug import sensitive_post_parameters
@@ -36,6 +39,54 @@ class CurrentProfileView(LoginRequiredMixin, ProfileView):
 
     def get_object(self):
         return self.get_queryset().get(pk=self.request.user.id)
+
+
+class UserFavorPlaceView(DetailView):
+
+    model = User
+    template_name = 'user/user_favor_place.html'
+    type_dict = {
+        'likes': 'Избранное участника',
+        'dones': 'Посещённое участником',
+        'wants': 'Хотелки участника',
+    }
+
+    def get(self, request, *args, **kwargs):
+        self.type_list = kwargs.get('type_list')
+        if self.type_list not in self.type_dict:
+            return HttpResponse('Bad request.', status=400)
+
+        return super().get(request, *args, **kwargs)
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        profile_object = self.get_object().profile
+        if self.type_list == 'likes':
+            context['place_list'] = profile_object.like_place.order_by('title').all()
+        elif self.type_list == 'dones':
+            context['place_list'] = profile_object.done_place.all()
+        elif self.type_list == 'wants':
+            context['place_list'] = profile_object.want_place.all()
+
+        return context
+
+    def title_page(self):
+        return f'{self.type_dict[self.type_list]} {self.get_object().username}'
+
+
+class CurrentUserFavorPlaceView(LoginRequiredMixin, UserFavorPlaceView):
+
+    type_dict = {
+        'likes': 'Моё избранное',
+        'dones': 'Мои посещения',
+        'wants': 'Мои хотелки',
+    }
+
+    def get_object(self):
+        return self.get_queryset().get(pk=self.request.user.id)
+
+    def title_page(self):
+        return self.type_dict[self.type_list]
 
 
 class LogoutView(LoginRequiredMixin, RedirectView):
@@ -139,11 +190,19 @@ class ProfileEditView(LoginRequiredMixin, SuccessMessageMixin, UpdateView):
 class ActionUserPlaceView(LoginRequiredMixin, RedirectView):
 
     url = '/'
+    action_dict = {
+        'like': 'добавлено в избранное.',
+        'unlike': 'удалено из избранного.',
+        'done': 'отмечено посещённым.',
+        'undone': 'отмечено непосещённым.',
+        'want': 'добавлено в хотелки.',
+        'unwant': 'убрано из хотелок.',
+    }
 
     def get(self, request, *args, **kwargs):
         place = Place.objects.get(pk=kwargs.get('pk'))
         action = kwargs.get('action')
-        if place and action:
+        if place and action and action in self.action_dict:
             profile = Profile.objects.get(pk=request.user.id)
             if action == 'like':
                 profile.like_place.add(place)
@@ -158,6 +217,18 @@ class ActionUserPlaceView(LoginRequiredMixin, RedirectView):
             elif action == 'unwant':
                 profile.want_place.remove(place)
 
-        self.url = place.get_absolute_url()
+            messages.success(request, 'Место «{0} {1}» {2}'.format(
+                place.type_place.title.lower(),
+                place.title,
+                self.action_dict[action],
+            ))
+
+        if request.GET.get('next'):
+            url = request.GET.get('next')
+        else:
+            url = place.get_absolute_url()
+
+        if url_has_allowed_host_and_scheme(url, request.site.domain):
+            self.url = url
 
         return super().get(request, *args, **kwargs)

@@ -8,7 +8,7 @@
     <div class="col-12 col-lg-8">
       <div class="card-body">
         <div class="d-flex justify-content-between align-items-end">
-          <div class="m-0"><small class="text-muted text-lowercase">{{ place.type_place.title }}</small> <span class="h3">{{ place.title }}</span></div>
+          <div class="m-0"><span class="h3">{{ place.title }}</span> <small class="text-muted text-lowercase">{{ place.type_place.title }}</small></div>
           <div>
             {% if place in user.profile.like_place.all %}
               <a href="{% url 'action_user_place' place.id 'unlike' %}" class="btn btn-outline-danger mki-grande" title="Удалить из избранного">&#xe08c;</a>
@@ -56,18 +56,13 @@
             </p>
           </div>
         </div>
-        <div class="row justify-content-between align-items-end">
-          <div>
-            {% if place.tags.all %}
-              <p class="card-text text-muted"><small>{% for tag in place.tags.all %}<a href="#" class="">{{ tag }}</a> {% endfor %}</small></p>
-            {% endif %}
-          </div>
-          <div>
-            <p class="card-text text-right text-muted"><small>{{ place.create_date }}</small></p>
-          </div>
-        </div>
+        <div>
+          {% if place.tags.all %}
+            <p class="card-text text-muted"><small>{% for tag in place.tags.all %}<a href="#" class="">{{ tag }}</a> {% endfor %}</small></p>
+          {% endif %}
         </div>
       </div>
+    </div>
     <div class="col-12 col-lg-4"><img style="width: 100%;" src="{{ place.image.mini }}"></div>
   </div>
 </div>
@@ -79,7 +74,6 @@
 {% endblock %}
 {% block extra_css %}
   {% leaflet_css %}
-  <link rel="stylesheet" href="{% static "style/leaflet.css" %}">
 {% endblock %}
 {% block extra_js %}
   {% leaflet_js plugins="icon" %}

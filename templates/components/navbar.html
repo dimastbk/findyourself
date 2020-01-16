@@ -7,6 +7,9 @@
   <div class="collapse navbar-collapse" id="navbarSupportedContent">
     <ul class="navbar-nav mr-auto">
       <li class="nav-item">
+        <a class="nav-link {% if request.resolver_match.url_name == 'indexlist' %}active{% endif %}" href="{% url 'indexlist' %}">Все места</a>
+      </li>
+      <li class="nav-item">
         <a class="nav-link {% if request.resolver_match.url_name == 'indexmap' %}active{% endif %}" href="{% url 'indexmap' %}">Карта</a>
       </li>
       {% if user.is_superuser %}
