@@ -8,7 +8,12 @@
     <div class="col-12 col-lg-8">
       <div class="card-body pb-1 h-100 d-flex flex-column">
         <div class="d-flex justify-content-between align-items-end border-bottom mb-2 pb-2">
-          <div class="m-0"><span class="h3">{{ place.title }}</span> <small class="text-muted text-lowercase">{{ place.type_place.title }}</small></div>
+          <div class="m-0">
+            <span class="h3"><span class="mki-intext mki-{{ place.type_place.icon }}" title="{{ place.type_place.title }}"></span> {{ place.title }}</span> 
+            {% if place.title_alt %}
+              <small class="text-muted ">({{ place.title_alt }})</small>
+            {% endif %}
+          </div>
           <div>
             {% if place in user.profile.like_place.all %}
               <a href="{% url 'action_user_place' place.id 'unlike' %}" class="btn btn-outline-danger mki-grande" title="Удалить из избранного">&#xe08c;</a>
@@ -27,40 +32,41 @@
             {% endif %}
           </div>
         </div>
-        <div class="d-flex align-content-between flex-wrap h-100">
-          <div class="row w-100">
-            <div class="col-12 col-lg-6">
-              <p>
-                <span>Начало маршрута:</span><br>
-                <span class="ml-3">{{ place.city.title }}</span>
-              </p>
-              <p>
-                <span>Местоположение:</span><br>
-                <span class="ml-3">{{ place.district.all.0 }}, {{ place.region.title }}</span>
-              </p>
-            </div>
-            <div class="col-12 col-lg-6">
-              <p>
-                <span>Посмотреть в других источниках:</span><br>
-                  <span class="ml-3">
-                    {% if place.wd_id %}
-                      <a href="https://www.wikidata.org/wiki/Special:GoToLinkedPage/ruwiki/{{ place.wd_id }}" title="Википедия"><img src="{% static 'icons/wikipedia.png' %}"></a>
-                    {% endif %}                    
-                    {% if place.ig_id %}
-                      <a href="https://www.instagram.com/explore/locations/{{ place.ig_id }}/" title="Инстаграм"><img src="{% static 'icons/instagram.png' %}"></a>
-                    {% endif %}
-                  </span>
-              </p>
-            </div>
+        <div class="d-flex flex-wrap h-100">
+          <div class="flex-fill">
+            <p>
+              <span>Начало маршрута:</span><br>
+              <span class="ml-3">{{ place.city.title }}</span>
+            </p>
+            <p>
+              <span>Местоположение:</span><br>
+              <span class="ml-3">{{ place.district.all.0 }}, {{ place.region.title }}</span>
+            </p>
           </div>
-          <div class="row w-100">
-            {% if place.tags.all %}
-              <div class="col-12 border-top pt-1 mt-1">
-                <p class="m-0 text-muted small">Теги: {% for tag in place.tags.all %}<a href="#" class="">{{ tag }}</a> {% endfor %}</p>
-              </div>
-            {% endif %}
+          <div class="flex-fill">
+            <p>
+              <span>Посмотреть в других источниках:</span><br>
+                <span class="ml-3">
+                  {% if place.wd_id %}
+                    <a href="{{ place.get_wd_link }}" title="Википедия"><img src="{% static 'icons/wikipedia.png' %}"></a>
+                  {% endif %}                    
+                  {% if place.ig_id %}
+                    <a href="{{ place.get_ig_link }}" title="Инстаграм"><img src="{% static 'icons/instagram.png' %}"></a>
+                  {% endif %}
+                </span>
+            </p>
           </div>
         </div>
+        {% if place.tags.all or user.is_superuser %}
+          <div class="d-flex flex-wrap w-100 border-top mt-1">
+            {% if place.tags.all %}
+              <div class="flex-fill small text-muted">Теги: {% for tag in place.tags.all %}<a href="#" class="">{{ tag }}</a> {% endfor %}</div>
+            {% endif %}
+            {% if user.is_superuser %}
+              <div class="flex-fill small text-right" ><a class="text-muted" href="{% url 'place_edit' place.pk %}">Редактировать</a></div>
+            {% endif %}
+          </div>
+        {% endif %}
       </div>
     </div>
     <div class="col-12 col-lg-4"><img style="width: 100%;" src="{{ place.image.mini }}"></div>

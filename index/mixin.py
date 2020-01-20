@@ -31,3 +31,28 @@ class CoordMixin():
         # координаты с с.ш. и в.д.
         if self.coord:
             return pretty_coord(self.coord.x, self.coord.y)
+
+
+class CssClassFormMixin():
+    # Добавляет специальный класс для полей, не прощедших валидацию
+
+    invalid_css_class = 'is-invalid'
+    default_css_class = 'form-control'
+    additional_css_class = ''
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        for field in self.fields.values():
+            field_attrs = field.widget.attrs
+            field_attrs.update({
+                'class': '{0} {1} {2}'.format(field_attrs.get('class', ''), self.default_css_class, self.additional_css_class),
+            })
+
+    def is_valid(self):
+        for f in self.errors:
+            if f != '__all__':
+                field_attrs = self.fields[f].widget.attrs
+                field_attrs.update({
+                    'class': '{0} {1}'.format(field_attrs.get('class', ''), self.invalid_css_class),
+                })
+        return super().is_valid()

@@ -4,34 +4,19 @@ from django.contrib.auth.models import User
 from django.forms.widgets import EmailInput, PasswordInput, Textarea, TextInput
 from django.utils.translation import gettext_lazy as _
 
+from index.mixin import CssClassFormMixin
 from index.models import City
 
 from .models import Profile
 
 
-class ValidClassFormMixin():
-    # Добавляет специальный класс для полей, не прощедших валидацию
-
-    invalid_css_class = 'is-invalid'
-
-    def is_valid(self):
-        for f in self.errors:
-            if f != '__all__':
-                field_attrs = self.fields[f].widget.attrs
-                field_attrs.update({
-                    'class': '{0} {1}'.format(field_attrs.get('class', ''), self.invalid_css_class),
-                })
-        return super().is_valid()
-
-
-class LoginForm(ValidClassFormMixin, AuthenticationForm):
+class LoginForm(CssClassFormMixin, AuthenticationForm):
 
     username = forms.CharField(
         label='Имя пользователя',
         max_length=30,
         min_length=4,
         widget=TextInput(attrs={
-            'class': 'form-control',
             'autofocus': True,
         }),
     )
@@ -39,43 +24,33 @@ class LoginForm(ValidClassFormMixin, AuthenticationForm):
         label='Пароль',
         max_length=30,
         min_length=4,
-        widget=PasswordInput(attrs={
-            'class': 'form-control',
-        }),
+        widget=PasswordInput(),
     )
 
 
-class RegistrationForm(ValidClassFormMixin, forms.ModelForm):
+class RegistrationForm(CssClassFormMixin, forms.ModelForm):
 
     username = forms.CharField(
         label='Имя пользователя',
         max_length=30,
         min_length=4,
-        widget=TextInput(attrs={
-            'class': 'form-control',
-        }),
+        widget=TextInput(),
     )
     email = forms.EmailField(
         label='E-mail',
-        widget=EmailInput(attrs={
-            'class': 'form-control',
-        }),
+        widget=EmailInput(),
     )
     password1 = forms.CharField(
         label='Пароль',
         max_length=30,
         min_length=8,
-        widget=PasswordInput(attrs={
-            'class': 'form-control',
-        }),
+        widget=PasswordInput(),
     )
     password2 = forms.CharField(
         label='Подтверждение пароля',
         max_length=30,
         min_length=8,
-        widget=PasswordInput(attrs={
-            'class': 'form-control',
-        }),
+        widget=PasswordInput(),
     )
 
     password_mismatch = 'Пароли не совпадают.'
@@ -102,22 +77,18 @@ class RegistrationForm(ValidClassFormMixin, forms.ModelForm):
         return user
 
 
-class UserForm(ValidClassFormMixin, forms.ModelForm):
+class UserForm(CssClassFormMixin, forms.ModelForm):
 
     username = forms.CharField(
         label='Имя пользователя',
         max_length=30,
         min_length=4,
-        widget=TextInput(attrs={
-            'class': 'form-control',
-        }),
+        widget=TextInput(),
     )
     first_name = forms.CharField(
         label='Имя',
         required=False,
-        widget=TextInput(attrs={
-            'class': 'form-control',
-        }),
+        widget=TextInput(),
     )
 
     def clean_username(self):
@@ -133,15 +104,13 @@ class UserForm(ValidClassFormMixin, forms.ModelForm):
         fields = ('username', 'first_name')
 
 
-class ProfileForm(ValidClassFormMixin, forms.ModelForm):
+class ProfileForm(CssClassFormMixin, forms.ModelForm):
 
     bio = forms.CharField(
         label='Информация о вас',
         required=False,
         max_length=500,
-        widget=Textarea(attrs={
-            'class': 'form-control',
-        }),
+        widget=Textarea(),
     )
     city = forms.ModelChoiceField(
         queryset=City.objects.all(),
@@ -149,17 +118,13 @@ class ProfileForm(ValidClassFormMixin, forms.ModelForm):
         label='Населённый пункт',
         required=False,
         help_text='Используется для показа пути от вашего места до начала маршрута.',
-        widget=forms.Select(attrs={
-            'class': 'form-control',
-        }),
+        widget=forms.Select(),
     )
     instagram = forms.CharField(
         label='Instagram',
         required=False,
         max_length=50,
-        widget=TextInput(attrs={
-            'class': 'form-control',
-        }),
+        widget=TextInput(),
     )
 
     class Meta:
@@ -167,13 +132,12 @@ class ProfileForm(ValidClassFormMixin, forms.ModelForm):
         fields = ('bio', 'city', 'instagram')
 
 
-class CustomPasswordChangeForm(ValidClassFormMixin, PasswordChangeForm):
+class CustomPasswordChangeForm(CssClassFormMixin, PasswordChangeForm):
 
     old_password = forms.CharField(
         label=_('Old password'),
         strip=False,
         widget=forms.PasswordInput(attrs={
-            'class': 'form-control',
             'autocomplete': 'current-password',
             'autofocus': True,
         }),
@@ -181,7 +145,6 @@ class CustomPasswordChangeForm(ValidClassFormMixin, PasswordChangeForm):
     new_password1 = forms.CharField(
         label=_('New password'),
         widget=forms.PasswordInput(attrs={
-            'class': 'form-control',
             'autocomplete': 'new-password',
         }),
         strip=False,
@@ -190,7 +153,6 @@ class CustomPasswordChangeForm(ValidClassFormMixin, PasswordChangeForm):
         label=_('New password confirmation'),
         strip=False,
         widget=forms.PasswordInput(attrs={
-            'class': 'form-control',
             'autocomplete': 'new-password',
         }),
     )

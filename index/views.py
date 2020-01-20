@@ -6,10 +6,11 @@ from django.utils.decorators import method_decorator
 from django.views.decorators.csrf import csrf_exempt
 from django.views.generic.base import TemplateView, View
 from django.views.generic.detail import DetailView
-from django.views.generic.edit import FormView
+from django.views.generic.edit import CreateView, FormView, UpdateView
+
 from uuslug import slugify
 
-from .forms import IndexMapForm
+from .forms import IndexMapForm, PlaceForm
 from .models import Place, Route, Type
 from .track_file import makeallgpx, makeallkml, makeoncegpx, makeoncekml
 
@@ -61,7 +62,7 @@ class IndexListPageView(FormView):
 
     def get(self, request, *args, **kwargs):
         context = self.get_context_data()
-        context['place_list'] = Place.objects.all()
+        context['place_list'] = Place.objects.filter(is_published=True).all()
         return self.render_to_response(context)
 
     def form_valid(self, form):
@@ -99,11 +100,6 @@ class PlaceDetailView(DetailView):
             self.get_object().title,
             self.get_object().type_place.title.lower(),
         )
-
-
-class RouteDetailView(DetailView):
-
-    model = Route
 
 
 class GetRoute(LoginRequiredMixin, View):
@@ -150,3 +146,19 @@ class GetAllRoute(LoginRequiredMixin, View):
         else:
             response = HttpResponseBadRequest()
         return response
+
+
+class PlaceCreateView(LoginRequiredMixin, CreateView):
+
+    model = Place
+    form_class = PlaceForm
+    title_page = 'Добавить новое место'
+    template_name = 'index/place_create.html'
+
+
+class PlaceEditView(LoginRequiredMixin, UpdateView):
+
+    model = Place
+    form_class = PlaceForm
+    title_page = 'Редактировать место'
+    template_name = 'index/place_edit.html'

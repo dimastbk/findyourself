@@ -1,6 +1,7 @@
-import simplekml as mod_kml
 from django.contrib.sites.shortcuts import get_current_site
 from django.urls import reverse
+
+import simplekml as mod_kml
 from gpxpy import gpx as mod_gpx
 
 

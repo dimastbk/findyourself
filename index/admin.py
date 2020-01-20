@@ -1,4 +1,5 @@
 from django.contrib import admin
+
 from leaflet.admin import LeafletGeoAdmin
 
 from .models import City, District, Place, Region, Route, Type
@@ -7,7 +8,7 @@ from .models import City, District, Place, Region, Route, Type
 @admin.register(Place)
 class PlaceAdmin(LeafletGeoAdmin):
     list_display = ('title', 'type_place', 'city', 'region', 'is_published')
-    actions = ['make_published']
+    actions = ['make_published', 'demake_published']
 
     def make_published(self, request, queryset):
         queryset.update(is_published=True)

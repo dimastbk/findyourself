@@ -1,7 +1,9 @@
-import srtm
 from django.contrib.gis.db import models
 from django.contrib.gis.geos import LineString
+from django.core.validators import RegexValidator
 from django.urls import reverse
+
+import srtm
 from imagefield.fields import ImageField
 from taggit.managers import TaggableManager
 
@@ -11,6 +13,12 @@ from .mixin import CoordMixin
 class Place(models.Model, CoordMixin):
 
     title = models.CharField(max_length=200, verbose_name='Название')
+    title_alt = models.CharField(
+        max_length=200,
+        verbose_name='Альтернативное название',
+        blank=True,
+        help_text='Другое распространённое название, иногда официальное название на картах. Например, Литовка для горы Фалаза.',
+    )
     text = models.TextField(verbose_name='Описание')
     image = ImageField(blank=True, auto_add_fields=True, verbose_name='Изображение')
     type_place = models.ForeignKey(
@@ -20,8 +28,19 @@ class Place(models.Model, CoordMixin):
         verbose_name='Категория',
     )
 
-    wd_id = models.CharField(blank=True, max_length=10)
-    ig_id = models.CharField(blank=True, max_length=20, verbose_name='Локация в IG')
+    wd_id = models.CharField(
+        blank=True,
+        max_length=10,
+        verbose_name='ID на Wikidata',
+        help_text='Например, Q4317189 для <a href="https://www.wikidata.org/wiki/Q4317189">водопад Неожиданный</a>.',
+        validators=[RegexValidator(regex='^Q(\d{1,9})$')],
+    )
+    ig_id = models.CharField(
+        blank=True,
+        max_length=20,
+        verbose_name='Локация в Инстаграме',
+        help_text='Например, 771936715 для <a href="https://www.instagram.com/explore/locations/771936715/">гора Ольховая</a>.',
+    )
     coord = models.PointField(blank=True, null=True, verbose_name='Координаты')
 
     city = models.ForeignKey(
@@ -30,6 +49,7 @@ class Place(models.Model, CoordMixin):
         blank=True,
         null=True,
         verbose_name='Населённый пункт',
+        help_text='Ближайший населённый пункт с которого начинаются основные маршруты.',
     )
     district = models.ManyToManyField('District', verbose_name='Район')
     region = models.ForeignKey(
@@ -54,6 +74,14 @@ class Place(models.Model, CoordMixin):
 
     def get_absolute_url(self):
         return reverse('place', kwargs={'pk': self.id})
+
+    def get_ig_link(self):
+        if self.ig_id:
+            return f'https://www.instagram.com/explore/locations/{self.ig_id}/'
+
+    def get_wd_link(self):
+        if self.wd_id:
+            return f'https://www.wikidata.org/wiki/Special:GoToLinkedPage/ruwiki/{self.wd_id}'
 
 
 class Type(models.Model):
@@ -236,16 +264,14 @@ class Route(models.Model, CoordMixin):
             # Вычисляем набор/потерю высоты
             if last_el:
                 if (el - last_el) > 0:
-                    el_gain += (el - last_el)
+                    el_gain += el - last_el
                 else:
-                    el_loss -= (el - last_el)
+                    el_loss -= el - last_el
 
             last_el = el
 
-        ls = LineString(
-            coord_list,
-            srid=4326,
-        )
+        ls = LineString(coord_list, srid=4326)
+
         self.ls = ls
         self.rt_el_gain = el_gain
         self.rt_el_loss = el_loss

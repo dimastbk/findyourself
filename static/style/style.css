@@ -22,3 +22,8 @@
 .btn-outline-warning:hover {
     color: white;
 }
+
+.imagefield-widget {
+    font-size: 80%;
+    font-weight: 400;
+}

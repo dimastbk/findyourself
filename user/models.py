@@ -15,6 +15,7 @@ class Profile(models.Model):
         on_delete=models.SET_NULL,
         null=True,
         verbose_name='Населённый пункт',
+        help_text='Используется для показа пути от этого места до начала маршрута.',
     )
     instagram = models.CharField(max_length=50, blank=True)
     like_place = models.ManyToManyField(

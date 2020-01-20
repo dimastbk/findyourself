@@ -29,10 +29,10 @@
         </div>
         <div class="col-lg-9 p-2">
           <div class="card-body p-0">
-            <p class="card-title mb-1"><span class="h4">{{ place.title }}</span> <small class="text-muted text-lowercase">{{ place.type_place.title }}</small></p>
+            <p class="card-title mb-1"><span class="h4"><span class="mki-intext mki-{{ place.type_place.icon }}" title="{{ place.type_place.title }}"></span> {{ place.title }}</span> <small class="text-muted">({{ place.title_alt }})</small></p>
             <p class="card-text m-0">
               {{ place.region }}, {{ place.city }} ({{ place.district.all.0 }})<br>
-              Тут будет маршрут!!!1
+              Маршрутов загружено: {{ place.route_place.count }}
             </p>
           </div>
         </div>
