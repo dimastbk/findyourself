@@ -26,7 +26,7 @@ class ProfileView(DetailView):
     """Отображение профиля любого пользователя."""
 
     model = User
-    template_name = 'user/profile.html'
+    template_name = 'user/user_detail.html'
 
     def title_page(self):
         return 'Профиль участника {0}'.format(self.get_object().username)

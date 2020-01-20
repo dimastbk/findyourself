@@ -91,7 +91,7 @@ class PlaceDetailView(DetailView):
         qs = super().get_queryset()
         qs = qs.filter(
             pk=self.kwargs['pk'], is_published=True,
-        ).select_related('city', 'type_place').prefetch_related('district', 'route_set')
+        ).select_related('city', 'type_place').prefetch_related('district', 'route_place')
         return qs
 
     def title_page(self):
@@ -133,7 +133,7 @@ class GetAllRoute(LoginRequiredMixin, View):
     def get(self, request, *args, **kwargs):
         routes = Place.objects.filter(
             pk=self.kwargs['pk'], is_published=True,
-        ).prefetch_related('route_set').first()
+        ).prefetch_related('route_place').first()
         filename = slugify(routes.title)
         if self.kwargs['format'] == 'kml':
             response = HttpResponse(

@@ -21,6 +21,7 @@ class Place(models.Model, CoordMixin):
     )
 
     wd_id = models.CharField(blank=True, max_length=10)
+    ig_id = models.CharField(blank=True, max_length=20, verbose_name='Локация в IG')
     coord = models.PointField(blank=True, null=True, verbose_name='Координаты')
 
     city = models.ForeignKey(
@@ -156,20 +157,51 @@ class Route(models.Model, CoordMixin):
         on_delete=models.SET_NULL,
         null=True,
         verbose_name='Начальный пункт',
+        related_name='route_city',
     )
     rt_to = models.ForeignKey(
         'Place',
         on_delete=models.SET_NULL,
         null=True,
         verbose_name='Конечный пункт',
+        related_name='route_place',
     )
-    ls = models.LineStringField(blank=True, null=True, srid=4326, verbose_name='Маршрут')
+    ls = models.LineStringField(blank=True, null=True, srid=4326, dim=3, verbose_name='Маршрут')
+    ls2 = models.LineStringField(blank=True, null=True, srid=4326, dim=2, verbose_name='2D-маршрут')
     rt_length = models.DecimalField(
         blank=True,
         null=True,
         max_digits=5,
         decimal_places=2,
         verbose_name='Длина',
+    )
+    rt_max_el = models.DecimalField(
+        blank=True,
+        null=True,
+        max_digits=6,
+        decimal_places=2,
+        verbose_name='Максимальная высота',
+    )
+    rt_min_el = models.DecimalField(
+        blank=True,
+        null=True,
+        max_digits=6,
+        decimal_places=2,
+        verbose_name='Минимальная высота',
+    )
+    rt_el_gain = models.DecimalField(
+        blank=True,
+        null=True,
+        max_digits=7,
+        decimal_places=2,
+        verbose_name='Набор высоты',
+    )
+    rt_el_loss = models.DecimalField(
+        blank=True,
+        null=True,
+        max_digits=7,
+        decimal_places=2,
+        verbose_name='Потеря высоты',
     )
     rt_type = models.CharField(
         max_length=1,
@@ -178,6 +210,7 @@ class Route(models.Model, CoordMixin):
         default='h',
         verbose_name='Тип маршрута',
     )
+    rt_is_gpx = models.BooleanField(default=False, verbose_name='GPX?')
 
     class Meta:
         verbose_name = 'Маршрут'
@@ -187,16 +220,43 @@ class Route(models.Model, CoordMixin):
         return f'{self.rt_from} - {self.rt_to}'
 
     def save(self, *args, **kwargs):
-        # Добавляем высоту (нужно добавить проверку на её отсутсвие)
         elevation_data = srtm.get_data()
+        max_el, min_el, el_gain, el_loss, el, last_el = 0, 9999, 0, 0, 0, None
+        coord_list = []
+
+        for p in self.ls2.coords:
+            # Добавляем высоту (нужно добавить проверку на её отсутсвие?)
+            el = elevation_data.get_elevation(p[1], p[0])
+            coord_list.append((p[0], p[1], el))
+
+            # Максимальная/минимальная высота
+            max_el = el if el > max_el else max_el
+            min_el = el if el < min_el else min_el
+
+            # Вычисляем набор/потерю высоты
+            if last_el:
+                if (el - last_el) > 0:
+                    el_gain += (el - last_el)
+                else:
+                    el_loss -= (el - last_el)
+
+            last_el = el
+
         ls = LineString(
-            [(p[0], p[1], elevation_data.get_elevation(p[1], p[0])) for p in self.ls.coords],
+            coord_list,
             srid=4326,
         )
+        self.ls = ls
+        self.rt_el_gain = el_gain
+        self.rt_el_loss = el_loss
+        self.rt_max_el = max_el
+        self.rt_min_el = min_el
+
         # считаем зону UTM для корректного расчёта длины
         # ls.centroid.x - долгота центра маршрута
         zone = 32660 - round((177 - ls.centroid.x) / 6)
         ls.transform(zone)
+
         # Считаем длину маршрута
         self.rt_length = ls.length / 1000
 

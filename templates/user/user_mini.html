@@ -1,0 +1,8 @@
+<a href="{% url 'user:profile' profile.id %}">
+  {% if profile.profile.image %} 
+    <img src="{{ profile.profile.image.micro }}" class="rounded w-100 h-auto" style="max-width: 150px;" alt="{{ profile }}" title="{{ profile }}">
+  {% else %}
+    {% load static %}
+    <img src="{% static 'no_image.jpg' %}" class="rounded w-100 h-auto" style="max-width: 150px;" alt="{{ profile }}" title="{{ profile }}">
+  {% endif %}
+</a>

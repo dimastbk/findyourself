@@ -3,48 +3,48 @@
 {% block content %}
   <div class="h4">{{ view.title_page }}</div>
   {% for place in place_list %}
-  <div class="card mb-3 active-target" id="place_{{ place.id }}">
-    <div class="row no-gutters">
-      <div class="col-lg-1">
-        <a href="{% url 'place' place.id %}" title="{{ place.title }}">{% if place.image %} 
-          <img src="{{ place.image.micro }}" class="card-img" alt="{{ place.title }}">
-          {% else %}
-            {% load static %}
-            <img src="{% static 'no_image.jpg' %}" class="card-img" alt="{{ place.title }}">
-          {% endif %}
-        </a>
-      </div>
-      <div class="col-lg-9 p-2">
-        <div class="card-body p-0">
-          <p class="card-title mb-1"><span class="h4">{{ place.title }}</span> <small class="text-muted text-lowercase">{{ place.type_place.title }}</small></p>
-          <p class="card-text m-0">
-            {{ place.region }}, {{ place.city }} ({{ place.district.all.0 }})<br>
-            Тут будет маршрут!!!1
-          </p>
+    <div class="card mb-3 active-target" id="place_{{ place.id }}">
+      <div class="row no-gutters">
+        <div class="col-lg-1">
+          <a href="{% url 'place' place.id %}" title="{{ place.title }}">{% if place.image %} 
+            <img src="{{ place.image.micro }}" class="card-img" alt="{{ place.title }}">
+            {% else %}
+              {% load static %}
+              <img src="{% static 'no_image.jpg' %}" class="card-img" alt="{{ place.title }}">
+            {% endif %}
+          </a>
         </div>
-      </div>
-      <div class="col-lg-2 p-2">
-        <div class="w-100 h-100 d-flex justify-content-around align-content-around flex-wrap">
-          {% if place in user.profile.like_place.all %}
-            <a href="{% url 'action_user_place' place.id 'unlike' %}?next={{ request.get_full_path }}#place_{{ place.id }}" class="btn btn-outline-danger btn-sm mki-grande" title="Удалить из избранного">&#xe08c;</a>
-          {% else %}
-            <a href="{% url 'action_user_place' place.id 'like' %}?next={{ request.get_full_path }}#place_{{ place.id }}" class="btn btn-outline-secondary btn-sm mki-grande" title="Добавить в избранное">&#xe08c;</a>
-          {% endif %}
-          {% if place in user.profile.done_place.all %}
-            <a href="{% url 'action_user_place' place.id 'undone' %}?next={{ request.get_full_path }}#place_{{ place.id }}" class="btn btn-outline-success btn-sm mki-grande" title="Снять отметку о посещении">✔</a>
-          {% else %}
-            <a href="{% url 'action_user_place' place.id 'done' %}?next={{ request.get_full_path }}#place_{{ place.id }}" class="btn btn-outline-secondary btn-sm mki-grande" title="Отметить посещённым">✔</a>
-          {% endif %}
-          {% if place in user.profile.want_place.all %}
-            <a href="{% url 'action_user_place' place.id 'unwant' %}?next={{ request.get_full_path }}#place_{{ place.id }}" class="btn btn-outline-warning btn-sm mki-grande" title="Убрать из хотелок">&#xe07a;</a>
-          {% else %}
-            <a href="{% url 'action_user_place' place.id 'want' %}?next={{ request.get_full_path }}#place_{{ place.id }}" class="btn btn-outline-secondary btn-sm mki-grande" title="Хочу посетить">&#xe07a;</a>
-          {% endif %}
-          <a href="{% url 'place' place.id %}" class="align-self-center">Подробнее</a> 
+        <div class="col-lg-9 p-2">
+          <div class="card-body p-0">
+            <p class="card-title mb-1"><span class="h4">{{ place.title }}</span> <small class="text-muted text-lowercase">{{ place.type_place.title }}</small></p>
+            <p class="card-text m-0">
+              {{ place.region }}, {{ place.city }} ({{ place.district.all.0 }})<br>
+              Тут будет маршрут!!!1
+            </p>
+          </div>
+        </div>
+        <div class="col-lg-2 p-2">
+          <div class="w-100 h-100 d-flex justify-content-around align-content-around flex-wrap">
+            {% if place in user.profile.like_place.all %}
+              <a href="{% url 'action_user_place' place.id 'unlike' %}?next={{ request.get_full_path }}#place_{{ place.id }}" class="btn btn-outline-danger btn-sm mki-grande" title="Удалить из избранного">&#xe08c;</a>
+            {% else %}
+              <a href="{% url 'action_user_place' place.id 'like' %}?next={{ request.get_full_path }}#place_{{ place.id }}" class="btn btn-outline-secondary btn-sm mki-grande" title="Добавить в избранное">&#xe08c;</a>
+            {% endif %}
+            {% if place in user.profile.done_place.all %}
+              <a href="{% url 'action_user_place' place.id 'undone' %}?next={{ request.get_full_path }}#place_{{ place.id }}" class="btn btn-outline-success btn-sm mki-grande" title="Снять отметку о посещении">✔</a>
+            {% else %}
+              <a href="{% url 'action_user_place' place.id 'done' %}?next={{ request.get_full_path }}#place_{{ place.id }}" class="btn btn-outline-secondary btn-sm mki-grande" title="Отметить посещённым">✔</a>
+            {% endif %}
+            {% if place in user.profile.want_place.all %}
+              <a href="{% url 'action_user_place' place.id 'unwant' %}?next={{ request.get_full_path }}#place_{{ place.id }}" class="btn btn-outline-warning btn-sm mki-grande" title="Убрать из хотелок">&#xe07a;</a>
+            {% else %}
+              <a href="{% url 'action_user_place' place.id 'want' %}?next={{ request.get_full_path }}#place_{{ place.id }}" class="btn btn-outline-secondary btn-sm mki-grande" title="Хочу посетить">&#xe07a;</a>
+            {% endif %}
+            <a href="{% url 'place' place.id %}" class="align-self-center">Подробнее</a> 
+          </div>
         </div>
       </div>
     </div>
-  </div>
   {% endfor %}
 {% endblock %}
 

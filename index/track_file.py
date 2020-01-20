@@ -48,7 +48,7 @@ def makeallkml(routes):
     kml.newpoint(name=routes.title, coords=routes.get_coord)
 
     from_list = []
-    for route in routes.route_set.all():
+    for route in routes.route_place.all():
         if route.rt_from.title not in from_list:
             kml.newpoint(name=route.rt_from.title, coords=route.rt_from.get_coord)
             from_list.append(route.rt_from.title)
@@ -71,7 +71,7 @@ def makeallgpx(routes):
     ))
 
     from_list = []
-    for route in routes.route_set.all():
+    for route in routes.route_place.all():
         if route.rt_from.title not in from_list:
             gpx.waypoints.append(mod_gpx.GPXWaypoint(
                 route.rt_from.coord.y,

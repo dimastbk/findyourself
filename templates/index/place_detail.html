@@ -6,8 +6,8 @@
 <div class="card mt-2" style="overflow: hidden;">
   <div class="row no-gutters">
     <div class="col-12 col-lg-8">
-      <div class="card-body">
-        <div class="d-flex justify-content-between align-items-end">
+      <div class="card-body pb-1 h-100 d-flex flex-column">
+        <div class="d-flex justify-content-between align-items-end border-bottom mb-2 pb-2">
           <div class="m-0"><span class="h3">{{ place.title }}</span> <small class="text-muted text-lowercase">{{ place.type_place.title }}</small></div>
           <div>
             {% if place in user.profile.like_place.all %}
@@ -27,45 +27,117 @@
             {% endif %}
           </div>
         </div>
-        <hr>
-        <div class="row">
-          <div class="col-12 col-lg-6">
-            <p class="card-text">
-              <span>Начало маршрута:</span><br>
-              <span class="ml-3">{{ place.city.title }}</span>
-            </p>
-            <p class="card-text">
-              Район:
-              {% for district in place.district.all %}
-                <br><span class="ml-3">{{ district.title }}</span>
-              {% endfor %}
-            </p>
-            <p class="card-text">
-              <span>Регион:</span><br>
-                <span class="ml-3">{{ place.region.title }}</span>
-            </p>
+        <div class="d-flex align-content-between flex-wrap h-100">
+          <div class="row w-100">
+            <div class="col-12 col-lg-6">
+              <p>
+                <span>Начало маршрута:</span><br>
+                <span class="ml-3">{{ place.city.title }}</span>
+              </p>
+              <p>
+                <span>Местоположение:</span><br>
+                <span class="ml-3">{{ place.district.all.0 }}, {{ place.region.title }}</span>
+              </p>
+            </div>
+            <div class="col-12 col-lg-6">
+              <p>
+                <span>Посмотреть в других источниках:</span><br>
+                  <span class="ml-3">
+                    {% if place.wd_id %}
+                      <a href="https://www.wikidata.org/wiki/Special:GoToLinkedPage/ruwiki/{{ place.wd_id }}" title="Википедия"><img src="{% static 'icons/wikipedia.png' %}"></a>
+                    {% endif %}                    
+                    {% if place.ig_id %}
+                      <a href="https://www.instagram.com/explore/locations/{{ place.ig_id }}/" title="Инстаграм"><img src="{% static 'icons/instagram.png' %}"></a>
+                    {% endif %}
+                  </span>
+              </p>
+            </div>
           </div>
-          <div class="col-12 col-lg-6">
-            <p class="card-text">
-              <span>Скачать все треки</span><br>
-                <span class="ml-3"><a href="{% url 'getallroute' place.pk 'gpx' %}">GPX</a>, <a href="{% url 'getallroute' place.pk 'kml' %}">KML</a></span>
-            </p>
-            <p class="card-text">
-              <span>Это место на:</span><br>
-                <span class="ml-3"><a href="https://www.wikidata.org/wiki/Special:GoToLinkedPage/ruwiki/{{ place.wd_id }}">Википедии</a></span>
-            </p>
+          <div class="row w-100">
+            {% if place.tags.all %}
+              <div class="col-12 border-top pt-1 mt-1">
+                <p class="m-0 text-muted small">Теги: {% for tag in place.tags.all %}<a href="#" class="">{{ tag }}</a> {% endfor %}</p>
+              </div>
+            {% endif %}
           </div>
-        </div>
-        <div>
-          {% if place.tags.all %}
-            <p class="card-text text-muted"><small>{% for tag in place.tags.all %}<a href="#" class="">{{ tag }}</a> {% endfor %}</small></p>
-          {% endif %}
         </div>
       </div>
     </div>
     <div class="col-12 col-lg-4"><img style="width: 100%;" src="{{ place.image.mini }}"></div>
   </div>
 </div>
+
+<div class="h4 mt-5 border-bottom">Участники</div>
+<div class="d-flex justify-content-center">
+  <div class="col-lg-5 p-2">
+    <div class="border-bottom border-right p-2 h-100">
+      <div class="h5">Посетили</div>
+      <div class="row mx-1">
+        {% for profile in place.done_place.all %}
+          <div class="p-1 col-2">
+            {% include "user/user_mini.html" %}
+          </div>
+        {% endfor %}
+      </div>
+      <p class="text-right small m-0"><a href="#">Весь список ({{ place.done_place.count }}) →</a></p>
+    </div>
+  </div>
+  <div class="col-lg-5 p-2">
+    <div class="border-bottom border-right p-2 h-100">
+      <div class="h5">Хотят посетить</div>
+      <div class="row mx-1">
+        {% for profile in place.want_place.all %}
+          <div class="p-1 col-2">
+            {% include "user/user_mini.html" %}
+          </div>
+        {% endfor %}
+      </div>
+      <p class="text-right small m-0"><a href="#">Весь список ({{ place.want_place.count }}) →</a></p>
+    </div>
+  </div>
+</div>
+
+<div class="h4 mt-5">Маршруты</div>
+<table class="table table-sm active-target" id="routes">
+  <thead>
+    <tr class="text-center">
+      <th scope="col">Тип</th>
+      <th scope="col">Название</th>
+      <th scope="col">Начало</th>
+      <th scope="col">Длина</th>
+      <th scope="col">Высота (макс./мин.)</th>
+      <th scope="col">Набор / потеря высоты</th>
+      <th scope="col">Скачать</th>
+    </tr>
+  </thead>
+  <tbody>
+  {% for route in place.route_place.all %}
+    <tr class="text-center active-target" id="route_{{ route.pk }}">
+      <td>{% if route.rt_type == 'a' %}
+        <span class='mki-grande mki-car'></span>
+      {% endif %}</td>
+      <td class="text-left">{{ route.rt_title }}</td>
+      <td>{{ route.rt_from }}</td>
+      <td>{{ route.rt_length }} км</td>
+      <td>{{ route.rt_min_el }} / {{ route.rt_max_el }}</td>
+      <td>+{{ route.rt_el_gain}} / -{{ route.rt_el_loss}}</td>
+      <td><a href="{% url 'getroute' route.pk 'gpx' %}">GPX</a>, <a href="{% url 'getroute' route.pk 'kml' %}">KML</a></td>
+    </tr>
+  {% endfor %}
+  </tbody>
+  <tfoot>
+    <tr class="text-center">
+      <td></td>
+      <td></td>
+      <td></td>
+      <td></td>
+      <td></td>
+      <td><b>Скачать все</b></td>
+      <td><a href="{% url 'getallroute' place.pk 'gpx' %}">GPX</a>, <a href="{% url 'getallroute' place.pk 'kml' %}">KML</a></td>
+    </tr>
+  </tfoot>
+</table>
+
 
 <div class="mt-2">
   {% leaflet_map "minimap" callback="window.map_init_basic" %}
@@ -102,14 +174,13 @@
             ))
         {% endif %}
 
-        {% for linestring in place.route_set.all %}
-          L.polyline({{ linestring.get_jsoncoord }}, {color: 'red'}).addTo(map).bindPopup(
-            '<div class="text-center font-weight-bold h6">{{ linestring.rt_title }}</div> \
-            <b>Тип:</b> {{ linestring.get_rt_type_display }}<br> \
-            <b>Начало:</b> {{ linestring.rt_from }}<br> \
-            <b>Длина:</b> {{ linestring.rt_length }} км<br> \
-            <b>Скачать:</b> <a href="{% url 'getroute' linestring.pk 'gpx' %}">GPX</a>, <a href="{% url 'getroute' linestring.pk 'kml' %}">KML</a> \
-            <div class="text-center font-weight-bold"><a href="{% url 'route' linestring.pk %}">Подробности</a></div>'
+        {% for route in place.route_place.all %}
+          L.polyline({{ route.get_jsoncoord }}, {color: 'red'}).addTo(map).bindPopup(
+            '<div class="text-center font-weight-bold h6">{{ route.rt_title }}</div> \
+            <b>Тип:</b> {{ route.get_rt_type_display }}<br> \
+            <b>Начало:</b> {{ route.rt_from }}<br> \
+            <b>Длина:</b> {{ route.rt_length }} км<br> \
+            <div class="text-center font-weight-bold"><a href="#route_{{ route.pk }}">Перейти к таблице</a></div>'
             );
         {% endfor %}
 

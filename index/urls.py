@@ -8,7 +8,7 @@ from .views import (GetAllRoute, GetRoute, IndexMapJsView, IndexMapPageView,
 urlpatterns = [
     path('route/<int:pk>/<format>/', GetRoute.as_view(), name='getroute'),
     path('route/<int:pk>/', RouteDetailView.as_view(), name='route'),
-    path('place/<int:pk>/<format>', GetAllRoute.as_view(), name='getallroute'),
+    path('route/<int:pk>/allroure/<format>/', GetAllRoute.as_view(), name='getallroute'),
     path('place/<int:pk>/<slug:action>/', ActionUserPlaceView.as_view(), name='action_user_place'),
     path('place/<int:pk>/', PlaceDetailView.as_view(), name='place'),
     path(
@@ -17,11 +17,6 @@ urlpatterns = [
         name='indexmap_js',
     ),
     path('map/', IndexMapPageView.as_view(), name='indexmap'),
-    path(
-        'list/<type_place>/<district>/<region>/',
-        IndexListPageView.as_view(),
-        name='indexlist_param',
-    ),
     path('list/', IndexListPageView.as_view(), name='indexlist'),
     path('', IndexPageView.as_view(), name='index'),
 ]
