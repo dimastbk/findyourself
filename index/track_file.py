@@ -1,5 +1,4 @@
 from django.contrib.sites.shortcuts import get_current_site
-from django.urls import reverse
 
 import simplekml as mod_kml
 from gpxpy import gpx as mod_gpx
@@ -100,7 +99,6 @@ def tr_description(rt):
         <b>Конец:</b> {rt.rt_to}<br>
         <b>Длина:</b> {rt.rt_length} км<br>
         <div style="text-align: center; font-weight: bold;">
-            <a href="http://{get_current_site(None).domain}{reverse(
-                'route', args=(rt.pk, ))}">Подробности</a>
+            <a href="http://{get_current_site(None).domain}">Взято отсюда</a>
         </div>
     ]]>""")

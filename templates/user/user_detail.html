@@ -47,7 +47,14 @@
         {% endif %}
         </div>
       </div>
-      <div class="col-12 col-lg-4"><img style="width: 100%;" src="{{ user.profile.image }}"></div>
+      <div class="col-12 col-lg-4">
+        {% if user.profile.image %} 
+          <img src="{{ user.profile.image.mini }}" class="rounded w-100 h-auto" alt="{{ user }}" title="{{ user }}">
+        {% else %}
+          {% load static %}
+          <img src="{% static 'no_image.jpg' %}" class="rounded w-100 h-auto" alt="{{ user }}" title="{{ user }}">
+        {% endif %}
+      </div>
     </div>
   </div>
 

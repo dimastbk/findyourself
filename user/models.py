@@ -4,12 +4,15 @@ from django.db.models.signals import post_save
 from django.dispatch import receiver
 from django.urls import reverse
 
+from imagefield.fields import ImageField
+
 from index.models import City, Place
 
 
 class Profile(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE)
     bio = models.TextField(max_length=500, blank=True, verbose_name='Краткая информация')
+    image = ImageField(blank=True, auto_add_fields=True, verbose_name='Изображение')
     city = models.ForeignKey(
         City,
         on_delete=models.SET_NULL,

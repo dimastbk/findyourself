@@ -1,9 +1,7 @@
 import json
 
-from .utils import pretty_coord
 
-
-class CoordMixin():
+class CoordMixin:
     @property
     def get_coord(self):
         # прямые координаты, используются в KML
@@ -19,7 +17,7 @@ class CoordMixin():
         if getattr(self, 'coord', False):
             return [(self.coord.y, self.coord.x)]
         elif getattr(self, 'ls', False):
-            return [(i[1], i[0]) for i in self.ls.coords]
+            return [(round(i[1], 5), round(i[0], 5)) for i in self.ls.coords]
         return ''
 
     @property
@@ -30,11 +28,19 @@ class CoordMixin():
     def get_pretty_coord(self):
         # координаты с с.ш. и в.д.
         if self.coord:
-            return pretty_coord(self.coord.x, self.coord.y)
+            return self._pretty_coord(self.coord.x, self.coord.y)
+
+    def _pretty_coord(self, _lat, _lon):
+        # принимает координаты и выводит в геоформате
+        # fixme: не смотрит на знак, для Чукотки нужно будет поправить
+        lat = f'{int(_lat)}° {int(_lat * 60 % 60)}\' {int(_lat * 3600 % 60)}\" в.д.'
+        lon = f'{int(_lon)}° {int(_lon * 60 % 60)}\' {int(_lon * 3600 % 60)}\" с.ш.'
+        return {'lat': lat, 'lon': lon}
 
 
-class CssClassFormMixin():
+class CssClassFormMixin:
     # Добавляет специальный класс для полей, не прощедших валидацию
+    # Добавляет botstrap form-control для всех виджетов
 
     invalid_css_class = 'is-invalid'
     default_css_class = 'form-control'
@@ -44,15 +50,25 @@ class CssClassFormMixin():
         super().__init__(*args, **kwargs)
         for field in self.fields.values():
             field_attrs = field.widget.attrs
-            field_attrs.update({
-                'class': '{0} {1} {2}'.format(field_attrs.get('class', ''), self.default_css_class, self.additional_css_class),
-            })
+            field_attrs.update(
+                {
+                    'class': '{0} {1} {2}'.format(
+                        field_attrs.get('class', ''),
+                        self.default_css_class,
+                        self.additional_css_class,
+                    ),
+                },
+            )
 
     def is_valid(self):
         for f in self.errors:
             if f != '__all__':
                 field_attrs = self.fields[f].widget.attrs
-                field_attrs.update({
-                    'class': '{0} {1}'.format(field_attrs.get('class', ''), self.invalid_css_class),
-                })
+                field_attrs.update(
+                    {
+                        'class': '{0} {1}'.format(
+                            field_attrs.get('class', ''), self.invalid_css_class,
+                        ),
+                    },
+                )
         return super().is_valid()

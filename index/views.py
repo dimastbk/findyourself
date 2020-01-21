@@ -10,7 +10,7 @@ from django.views.generic.edit import CreateView, FormView, UpdateView
 
 from uuslug import slugify
 
-from .forms import IndexMapForm, PlaceForm
+from .forms import IndexMapForm, PlaceForm, RouteForm
 from .models import Place, Route, Type
 from .track_file import makeallgpx, makeallkml, makeoncegpx, makeoncekml
 
@@ -102,7 +102,7 @@ class PlaceDetailView(DetailView):
         )
 
 
-class GetRoute(LoginRequiredMixin, View):
+class RouteDownloadView(LoginRequiredMixin, View):
 
     def get(self, request, *args, **kwargs):
         route = Route.objects.select_related('rt_from', 'rt_to').get(pk=self.kwargs['pk'])
@@ -124,7 +124,7 @@ class GetRoute(LoginRequiredMixin, View):
         return response
 
 
-class GetAllRoute(LoginRequiredMixin, View):
+class PlaceAllRouteDownloadView(LoginRequiredMixin, View):
 
     def get(self, request, *args, **kwargs):
         routes = Place.objects.filter(
@@ -148,15 +148,49 @@ class GetAllRoute(LoginRequiredMixin, View):
         return response
 
 
-class PlaceCreateView(LoginRequiredMixin, CreateView):
+class PlaceCreateEditMixin(LoginRequiredMixin):
 
     model = Place
     form_class = PlaceForm
-    title_page = 'Добавить новое место'
+
+    def get_success_url(self):
+        if '_addroute' in self.request.POST:
+            return reverse('route_create_pk', kwargs={'pk': self.object.pk})
+
+        return super().get_success_url()
 
 
-class PlaceEditView(LoginRequiredMixin, UpdateView):
+class PlaceCreateView(PlaceCreateEditMixin, CreateView):
+    title_page = 'Добавить место'
 
-    model = Place
-    form_class = PlaceForm
+
+class PlaceEditView(PlaceCreateEditMixin, UpdateView):
     title_page = 'Редактировать место'
+
+
+class RouteCreateEditMixin(LoginRequiredMixin):
+
+    model = Route
+    form_class = RouteForm
+
+    def get_success_url(self):
+        if '_addnext' in self.request.POST:
+            return reverse('route_create')
+
+        return super().get_success_url()
+
+
+class RouteCreateView(RouteCreateEditMixin, CreateView):
+    title_page = 'Добавить машрут'
+
+
+class RouteCreatePkView(RouteCreateView, CreateView):
+
+    def get_initial(self):
+        initial = super().get_initial()
+        initial.update(rt_to=self.kwargs.get('pk', ''))
+        return initial
+
+
+class RouteEditView(RouteCreateEditMixin, UpdateView):
+    title_page = 'Редактировать маршрут'

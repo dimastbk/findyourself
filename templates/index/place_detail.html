@@ -69,7 +69,14 @@
         {% endif %}
       </div>
     </div>
-    <div class="col-12 col-lg-4"><img style="width: 100%;" src="{{ place.image.mini }}"></div>
+    <div class="col-12 col-lg-4">  
+      {% if place.image %} 
+        <img src="{{ place.image.mini }}" class="rounded w-100 h-auto" alt="{{ place.title }}" title="{{ place.title }}">
+      {% else %}
+        {% load static %}
+        <img src="{% static 'no_image.jpg' %}" class="rounded w-100 h-auto" alt="{{ place.title }}" title="{{ place.title }}">
+      {% endif %}
+    </div>
   </div>
 </div>
 
@@ -111,7 +118,7 @@
       <th scope="col">Название</th>
       <th scope="col">Начало</th>
       <th scope="col">Длина</th>
-      <th scope="col">Высота (макс./мин.)</th>
+      <th scope="col">Высота (мин./макс.)</th>
       <th scope="col">Набор / потеря высоты</th>
       <th scope="col">Скачать</th>
     </tr>
@@ -127,19 +134,17 @@
       <td>{{ route.rt_length }} км</td>
       <td>{{ route.rt_min_el }} / {{ route.rt_max_el }}</td>
       <td>+{{ route.rt_el_gain}} / -{{ route.rt_el_loss}}</td>
-      <td><a href="{% url 'getroute' route.pk 'gpx' %}">GPX</a>, <a href="{% url 'getroute' route.pk 'kml' %}">KML</a></td>
+      <td><a href="{% url 'route_get' route.pk 'gpx' %}">GPX</a>, <a href="{% url 'route_get' route.pk 'kml' %}">KML</a></td>
     </tr>
   {% endfor %}
   </tbody>
   <tfoot>
     <tr class="text-center">
-      <td></td>
-      <td></td>
-      <td></td>
+      <td colspan="3" class="text-left"><a href="{% url 'route_create_pk' place.pk %}">Добавить</a></td>
       <td></td>
       <td></td>
       <td><b>Скачать все</b></td>
-      <td><a href="{% url 'getallroute' place.pk 'gpx' %}">GPX</a>, <a href="{% url 'getallroute' place.pk 'kml' %}">KML</a></td>
+      <td><a href="{% url 'place_allroute_get' place.pk 'gpx' %}">GPX</a>, <a href="{% url 'place_allroute_get' place.pk 'kml' %}">KML</a></td>
     </tr>
   </tfoot>
 </table>

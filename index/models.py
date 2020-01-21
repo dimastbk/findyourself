@@ -169,6 +169,9 @@ class Route(models.Model, CoordMixin):
         verbose_name='Конечный пункт',
         related_name='route_place',
     )
+    rt_type = models.CharField(
+        max_length=1, choices=status, blank=True, default='h', verbose_name='Тип маршрута',
+    )
     ls = models.LineStringField(blank=True, null=True, srid=4326, dim=3, verbose_name='Маршрут')
     ls2 = models.LineStringField(blank=True, null=True, srid=4326, dim=2, verbose_name='2D-маршрут')
     rt_length = models.DecimalField(
@@ -186,9 +189,6 @@ class Route(models.Model, CoordMixin):
     rt_el_loss = models.DecimalField(
         blank=True, null=True, max_digits=7, decimal_places=2, verbose_name='Потеря высоты',
     )
-    rt_type = models.CharField(
-        max_length=1, choices=status, blank=True, default='h', verbose_name='Тип маршрута',
-    )
     rt_is_gpx = models.BooleanField(default=False, verbose_name='GPX?')
 
     class Meta:
@@ -198,43 +198,73 @@ class Route(models.Model, CoordMixin):
     def __str__(self):
         return f'{self.rt_from} - {self.rt_to}'
 
+    def get_absolute_url(self):
+        return reverse('place', kwargs={'pk': self.rt_to.pk})
+
     def save(self, *args, **kwargs):
         elevation_data = srtm.get_data()
         max_el, min_el, el_gain, el_loss, el, last_el = 0, 9999, 0, 0, 0, None
-        coord_list = []
+        coord_list, ls = [], False
 
-        for p in self.ls2.coords:
-            # Добавляем высоту (нужно добавить проверку на её отсутсвие?)
-            el = elevation_data.get_elevation(p[1], p[0])
-            coord_list.append((p[0], p[1], el))
+        # todo: возможно, есть разные случаи, нужно больше тестов
 
-            # Максимальная/минимальная высота
-            max_el = el if el > max_el else max_el
-            min_el = el if el < min_el else min_el
+        # если gpx (ставится в обработчике формы), то проверяем наличие высоты
+        if self.rt_is_gpx and hasattr(self, 'coords'):
+            ls = LineString(self.coords, srid=4326)
+            # уменьшаем количество точек в треке
+            # вероятно, нужно это делать до подсчёта высоты и длины, ибо данные получаются неверными 
+            ls = ls.simplify(tolerance=0.00001)
+            # если высота отсутствует, то копируем в 2D и убираем флаг GPX
+            if not ls.hasz:
+                self.ls2 = ls
+                self.rt_is_gpx = False
 
-            # Вычисляем набор/потерю высоты
-            if last_el:
-                if (el - last_el) > 0:
-                    el_gain += el - last_el
-                else:
-                    el_loss -= el - last_el
+        # если есть плоские коордиинаты, то считаем высоту из SRTM
+        if not self.rt_is_gpx and self.ls2:
+            for p in self.ls2.coords:
+                # Добавляем высоту
+                el = elevation_data.get_elevation(p[1], p[0])
+                coord_list.append((p[0], p[1], el))
 
-            last_el = el
+                ls = LineString(coord_list, srid=4326)
 
-        ls = LineString(coord_list, srid=4326)
+        # иначе забиваем ls2, убирая высоту (нужно для виджета leaflet)
+        else:
+            self.ls2 = LineString(
+                [(p[0], p[1]) for p in ls.coords],
+                srid=4326,
+            )
 
-        self.ls = ls
-        self.rt_el_gain = el_gain
-        self.rt_el_loss = el_loss
-        self.rt_max_el = max_el
-        self.rt_min_el = min_el
+        # если есть линия, то начинаем считать высоты и потери
+        if ls:
+            for pnt in ls.coords:
+                el = pnt[2]
 
-        # считаем зону UTM для корректного расчёта длины
-        # ls.centroid.x - долгота центра маршрута
-        zone = 32660 - round((177 - ls.centroid.x) / 6)
-        ls.transform(zone)
+                # Максимальная/минимальная высота
+                max_el = el if el > max_el else max_el
+                min_el = el if el < min_el else min_el
 
-        # Считаем длину маршрута
-        self.rt_length = ls.length / 1000
+                # Вычисляем набор/потерю высоты
+                if last_el:
+                    if (el - last_el) > 0:
+                        el_gain += el - last_el
+                    else:
+                        el_loss -= el - last_el
+
+                last_el = el
+
+            self.ls = ls
+            self.rt_el_gain = el_gain
+            self.rt_el_loss = el_loss
+            self.rt_max_el = max_el
+            self.rt_min_el = min_el
+
+            # считаем зону UTM для корректного расчёта длины
+            # ls.centroid.x - долгота центра маршрута
+            zone = 32660 - round((177 - ls.centroid.x) / 6)
+            ls.transform(zone)
+
+            # Считаем длину маршрута
+            self.rt_length = ls.length / 1000
 
         super().save(*args, **kwargs)

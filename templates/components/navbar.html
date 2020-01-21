@@ -12,20 +12,25 @@
       <li class="nav-item">
         <a class="nav-link {% if request.resolver_match.url_name == 'indexmap' %}active{% endif %}" href="{% url 'indexmap' %}">Карта</a>
       </li>
-      {% if user.is_superuser %}
+      {% if user.is_authenticated %}
         <li class="nav-item">
-          <a class="nav-link" href="{% url 'admin:index' %}">Админ-панель</a>
+          <a class="nav-link {% if request.resolver_match.url_name == 'place_create' %}active{% endif %}" href="{% url 'place_create' %}">Добавить</a>
         </li>
+        {% if user.is_superuser %}
+          <li class="nav-item">
+            <a class="nav-link" href="{% url 'admin:index' %}">Админ-панель</a>
+          </li>
+        {% endif %}
       {% endif %}
     </ul>
     <ul class="navbar-nav">
       {% if user.is_authenticated %}
-      <li class="nav-item">
-        <a class="nav-link {% if request.resolver_match.url_name == 'current_profile' %}active{% endif %}" href="{% url 'user:current_profile' %}">Мой профиль</a>
-      </li>
-      <li class="nav-item">
-        <a class="nav-link" href="{% url 'user:logout' %}">Выйти</a>
-      </li>
+        <li class="nav-item">
+          <a class="nav-link {% if request.resolver_match.url_name == 'current_profile' %}active{% endif %}" href="{% url 'user:current_profile' %}">Мой профиль</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="{% url 'user:logout' %}">Выйти</a>
+        </li>
       {% else %}
         <li class="nav-item">
           <a class="nav-link" href="{% url 'user:registration' %}">Зарегистрироваться</a>

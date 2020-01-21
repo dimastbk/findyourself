@@ -71,7 +71,7 @@ class ProfileForm(CssClassFormMixin, forms.ModelForm):
 
     class Meta:
         model = Profile
-        fields = ('bio', 'city', 'instagram')
+        fields = ('image', 'bio', 'city', 'instagram')
 
 
 class CustomPasswordChangeForm(CssClassFormMixin, PasswordChangeForm):
