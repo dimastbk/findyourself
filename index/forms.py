@@ -28,16 +28,22 @@ class IndexMapForm(CssClassFormMixin, forms.Form):
 
 
 class PlaceForm(CssClassFormMixin, forms.ModelForm):
-
     class Meta:
         model = Place
         fields = (
-            'title', 'title_alt', 'text', 'image', 'type_place',
-            'wd_id', 'ig_id', 'coord', 'city', 'district', 'region',
+            'title',
+            'title_alt',
+            'text',
+            'image',
+            'type_place',
+            'wd_id',
+            'ig_id',
+            'coord',
+            'city',
+            'district',
+            'region',
         )
         widgets = {
             'coord': LeafletWidget(),
-            'text': forms.Textarea(attrs={
-                'rows': 3,
-            }),
+            'text': forms.Textarea(attrs={'rows': 3}),
         }

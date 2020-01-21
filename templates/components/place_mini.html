@@ -1,0 +1,8 @@
+<a href="{% url 'place' place.pk %}">
+  {% if place.image %} 
+    <img src="{{ place.image.micro }}" class="rounded w-100 h-auto" alt="{{ place.title }}" title="{{ place.title }}">
+  {% else %}
+    {% load static %}
+    <img src="{% static 'no_image.jpg' %}" class="rounded w-100 h-auto" alt="{{ place.title }}" title="{{ place.title }}">
+  {% endif %}
+</a>

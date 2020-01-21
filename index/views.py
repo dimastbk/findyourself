@@ -153,7 +153,6 @@ class PlaceCreateView(LoginRequiredMixin, CreateView):
     model = Place
     form_class = PlaceForm
     title_page = 'Добавить новое место'
-    template_name = 'index/place_create.html'
 
 
 class PlaceEditView(LoginRequiredMixin, UpdateView):
@@ -161,4 +160,3 @@ class PlaceEditView(LoginRequiredMixin, UpdateView):
     model = Place
     form_class = PlaceForm
     title_page = 'Редактировать место'
-    template_name = 'index/place_edit.html'

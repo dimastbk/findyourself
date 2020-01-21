@@ -9,7 +9,7 @@ from index.models import City, Place
 
 class Profile(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE)
-    bio = models.TextField(max_length=500, blank=True)
+    bio = models.TextField(max_length=500, blank=True, verbose_name='Краткая информация')
     city = models.ForeignKey(
         City,
         on_delete=models.SET_NULL,

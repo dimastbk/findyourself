@@ -3,7 +3,7 @@
 {% load leaflet_tags %}
 
 {% block content %}
-  <div class="h4 mt-3 mb-1">Добавить новое место</div>
+  <div class="h4 mt-3 mb-1">{{ view.title_page }}</div>
   <div class="row mb-4">
     <div class="col-12 col-lg-6 offset-lg-3">
       {% if form.non_field_errors %}
@@ -32,7 +32,7 @@
           </div>
         {% endfor %}
         <div class="d-flex justify-content-around">
-          <button class="btn btn-success" type="submit">Добавить</button>
+          <button class="btn btn-success" type="submit">Сохранить</button>
         </div>
       </form>
     </div>

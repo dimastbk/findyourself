@@ -1,9 +1,0 @@
-<a href="{% url 'place' place.pk %}">
-  {% if place.image %} 
-    <img src="{{ place.image.micro }}" class="rounded w-100 h-auto" style="max-width: 150px;" alt="{{ place.title }}" title="{{ place.title }}">
-  {% else %}
-    {% load static %}
-    <img src="{% static 'no_image.jpg' %}" class="rounded w-100 h-auto" style="max-width: 150px;" alt="{{ place.title }}" title="{{ place.title }}">
-  {% endif %}
-</a>
-<span class="px-1" style="font-size: 97%;">{{ place.title }}</span>

@@ -71,7 +71,7 @@ class UserFavorPlaceView(DetailView):
         return context
 
     def title_page(self):
-        return f'{self.type_dict[self.type_list]} {self.get_object().username}'
+        return f'{self.type_dict[self.type_list]} @{self.get_object().username}'
 
 
 class CurrentUserFavorPlaceView(LoginRequiredMixin, UserFavorPlaceView):

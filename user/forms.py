@@ -1,45 +1,20 @@
 from django import forms
 from django.contrib.auth.forms import AuthenticationForm, PasswordChangeForm
 from django.contrib.auth.models import User
-from django.forms.widgets import EmailInput, PasswordInput, Textarea, TextInput
+from django.forms.widgets import PasswordInput
 from django.utils.translation import gettext_lazy as _
 
 from index.mixin import CssClassFormMixin
-from index.models import City
 
 from .models import Profile
 
 
 class LoginForm(CssClassFormMixin, AuthenticationForm):
-
-    username = forms.CharField(
-        label='Имя пользователя',
-        max_length=30,
-        min_length=4,
-        widget=TextInput(attrs={
-            'autofocus': True,
-        }),
-    )
-    password = forms.CharField(
-        label='Пароль',
-        max_length=30,
-        min_length=4,
-        widget=PasswordInput(),
-    )
+    pass
 
 
 class RegistrationForm(CssClassFormMixin, forms.ModelForm):
 
-    username = forms.CharField(
-        label='Имя пользователя',
-        max_length=30,
-        min_length=4,
-        widget=TextInput(),
-    )
-    email = forms.EmailField(
-        label='E-mail',
-        widget=EmailInput(),
-    )
     password1 = forms.CharField(
         label='Пароль',
         max_length=30,
@@ -79,18 +54,6 @@ class RegistrationForm(CssClassFormMixin, forms.ModelForm):
 
 class UserForm(CssClassFormMixin, forms.ModelForm):
 
-    username = forms.CharField(
-        label='Имя пользователя',
-        max_length=30,
-        min_length=4,
-        widget=TextInput(),
-    )
-    first_name = forms.CharField(
-        label='Имя',
-        required=False,
-        widget=TextInput(),
-    )
-
     def clean_username(self):
         user_id = self.instance.id
         username = self.cleaned_data['username']
@@ -105,27 +68,6 @@ class UserForm(CssClassFormMixin, forms.ModelForm):
 
 
 class ProfileForm(CssClassFormMixin, forms.ModelForm):
-
-    bio = forms.CharField(
-        label='Информация о вас',
-        required=False,
-        max_length=500,
-        widget=Textarea(),
-    )
-    city = forms.ModelChoiceField(
-        queryset=City.objects.all(),
-        empty_label='',
-        label='Населённый пункт',
-        required=False,
-        help_text='Используется для показа пути от вашего места до начала маршрута.',
-        widget=forms.Select(),
-    )
-    instagram = forms.CharField(
-        label='Instagram',
-        required=False,
-        max_length=50,
-        widget=TextInput(),
-    )
 
     class Meta:
         model = Profile

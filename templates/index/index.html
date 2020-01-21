@@ -5,7 +5,8 @@
   <div class="row mx-2">
     {% for place in latest_places %}
       <div class="p-2 col-6 col-lg-2">
-        {% include "./place_mini.html" %}
+        {% include "components/place_mini.html" %}
+        <span class="px-1" style="font-size: 97%;">{{ place.title }}</span>
       </div>
     {% endfor %}
   </div>

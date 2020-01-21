@@ -4,55 +4,54 @@
   <div class="card mt-2" style="overflow: hidden;">
     <div class="row no-gutters">
       <div class="col-12 col-lg-8">
-        <div class="card-body">
-          <div class="d-flex justify-content-between align-items-end">
+        <div class="card-body pb-1 h-100 d-flex flex-column">
+          <div class="d-flex justify-content-between align-items-end border-bottom mb-2 pb-2">
             <div class="h4 m-0">@{{ user.username }}</div>
-            {% if request.resolver_match.url_name == 'current_profile' %}
-              <a href="{% url 'user:edit_profile' %}">Редактировать профиль</a>
-            {% endif %}
           </div>
-          <hr>
-          <div class="row">
-            <div class="col-12 col-lg-6">
-              <p class="card-text">
+          <div class="d-flex flex-wrap h-100">
+            <div class="flex-fill">
+              <p>
                 <span>Имя:</span><br>
                 <span class="ml-3">{{ user.first_name }}</span>
               </p>
-              <p class="card-text">
+              <p>
                 <span>Город:</span><br>
                 <span class="ml-3">{{ user.profile.city.title }}</span>
               </p>
             </div>
-            <div class="col-12 col-lg-6">
+            <div class="flex-fill">
               {% if user.profile.like_place.all %}
-                <p class="card-text">
+                <p>
                   <span><a href="#likes">В избранном:</a></span><br>
-                    <span class="ml-3">{{ user.profile.like_place.count }}</span>
+                  <span class="ml-3">{{ user.profile.like_place.count }}</span>
                 </p>
               {% endif %}
               {% if user.profile.done_place.all %}
-                <p class="card-text">
+                <p>
                   <span><a href="#dones">Посещено:</a></span><br>
-                    <span class="ml-3">{{ user.profile.done_place.count }}</span>
+                  <span class="ml-3">{{ user.profile.done_place.count }}</span>
                 </p>
               {% endif %}
               {% if user.profile.want_place.all %}
-                <p class="card-text">
+                <p>
                   <span><a href="#wants">К посещению:</a></span><br>
-                    <span class="ml-3">{{ user.profile.want_place.count }}</span>
+                  <span class="ml-3">{{ user.profile.want_place.count }}</span>
                 </p>
               {% endif %}
-              <p class="card-text">
-                <span>Проехано:</span><br>
-                  <span class="ml-3">{{ user.profile.length_auto }}</span>
-              </p>
             </div>
           </div>
+          {% if request.resolver_match.url_name == 'current_profile' %}
+          <div class="d-flex flex-wrap border-top mt-1">
+            <div class="flex-fill small text-right" ><a class="text-muted" href="{% url 'user:edit_profile' %}">Редактировать профиль</a></div>
+          </div>
+        {% endif %}
         </div>
       </div>
       <div class="col-12 col-lg-4"><img style="width: 100%;" src="{{ user.profile.image }}"></div>
     </div>
   </div>
+
+
   <div class="row">
     {% if user.profile.like_place.all %}
     <div class="col-lg-4 p-2">
@@ -61,7 +60,7 @@
         <div class="row mx-1">
           {% for place in user.profile.like_place.all %}
             <div class="p-1 col-2">
-              {% include "./place_mini.html" %}
+              {% include "components/place_mini.html" %}
             </div>
           {% endfor %}
         </div>
@@ -76,7 +75,7 @@
         <div class="row mx-1">
           {% for place in user.profile.done_place.all %}
             <div class="p-1 col-2">
-              {% include "./place_mini.html" %}
+              {% include "components/place_mini.html" %}
             </div>
           {% endfor %}
         </div>
@@ -92,7 +91,7 @@
             {% for place in user.profile.want_place.all %}
               {% if place.is_published %}
                 <div class="p-1 col-2">
-                  {% include "./place_mini.html" %}
+                  {% include "components/place_mini.html" %}
                 </div>
               {% endif %}
             {% endfor %}

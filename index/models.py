@@ -17,29 +17,29 @@ class Place(models.Model, CoordMixin):
         max_length=200,
         verbose_name='Альтернативное название',
         blank=True,
-        help_text='Другое распространённое название, иногда официальное название на картах. Например, Литовка для горы Фалаза.',
+        help_text='Другое распространённое название, иногда официальное название на картах. '
+        + 'Например, Литовка для горы Фалаза.',
     )
     text = models.TextField(verbose_name='Описание')
     image = ImageField(blank=True, auto_add_fields=True, verbose_name='Изображение')
     type_place = models.ForeignKey(
-        'Type',
-        on_delete=models.SET_NULL,
-        null=True,
-        verbose_name='Категория',
+        'Type', on_delete=models.SET_NULL, null=True, verbose_name='Категория',
     )
 
     wd_id = models.CharField(
         blank=True,
         max_length=10,
         verbose_name='ID на Wikidata',
-        help_text='Например, Q4317189 для <a href="https://www.wikidata.org/wiki/Q4317189">водопад Неожиданный</a>.',
-        validators=[RegexValidator(regex='^Q(\d{1,9})$')],
+        help_text='Например, Q4317189 для '
+        + '<a href="https://www.wikidata.org/wiki/Q4317189">водопад Неожиданный</a>.',
+        validators=[RegexValidator(regex='^Q([0-9]{1,9})$')],
     )
     ig_id = models.CharField(
         blank=True,
         max_length=20,
         verbose_name='Локация в Инстаграме',
-        help_text='Например, 771936715 для <a href="https://www.instagram.com/explore/locations/771936715/">гора Ольховая</a>.',
+        help_text='Например, 771936715 для '
+        + '<a href="https://www.instagram.com/explore/locations/771936715/">гора Ольховая</a>.',
     )
     coord = models.PointField(blank=True, null=True, verbose_name='Координаты')
 
@@ -53,11 +53,7 @@ class Place(models.Model, CoordMixin):
     )
     district = models.ManyToManyField('District', verbose_name='Район')
     region = models.ForeignKey(
-        'Region',
-        on_delete=models.SET_NULL,
-        null=True,
-        blank=True,
-        verbose_name='Регион',
+        'Region', on_delete=models.SET_NULL, null=True, blank=True, verbose_name='Регион',
     )
 
     tags = TaggableManager(blank=True)
@@ -101,18 +97,10 @@ class City(models.Model, CoordMixin):
     title = models.CharField(max_length=200, verbose_name='Название')
 
     ae1 = models.ForeignKey(
-        'District',
-        on_delete=models.SET_NULL,
-        null=True,
-        blank=True,
-        verbose_name='Район',
+        'District', on_delete=models.SET_NULL, null=True, blank=True, verbose_name='Район',
     )
     ae2 = models.ForeignKey(
-        'Region',
-        on_delete=models.SET_NULL,
-        null=True,
-        blank=True,
-        verbose_name='Регион',
+        'Region', on_delete=models.SET_NULL, null=True, blank=True, verbose_name='Регион',
     )
 
     wd_id = models.CharField(max_length=10)
@@ -129,17 +117,9 @@ class City(models.Model, CoordMixin):
 
 class District(models.Model):
     title = models.CharField(max_length=200, verbose_name='Название')
-    capital = models.ForeignKey(
-        'City',
-        on_delete=models.SET_NULL,
-        null=True,
-        verbose_name='Центр',
-    )
+    capital = models.ForeignKey('City', on_delete=models.SET_NULL, null=True, verbose_name='Центр')
     region = models.ForeignKey(
-        'Region',
-        on_delete=models.SET_NULL,
-        null=True,
-        verbose_name='Регион',
+        'Region', on_delete=models.SET_NULL, null=True, verbose_name='Регион',
     )
     wd_id = models.CharField(max_length=10)
 
@@ -154,12 +134,7 @@ class District(models.Model):
 
 class Region(models.Model):
     title = models.CharField(max_length=200, verbose_name='Название')
-    capital = models.ForeignKey(
-        'City',
-        on_delete=models.SET_NULL,
-        null=True,
-        verbose_name='Центр',
-    )
+    capital = models.ForeignKey('City', on_delete=models.SET_NULL, null=True, verbose_name='Центр')
     wd_id = models.CharField(max_length=10)
 
     class Meta:
@@ -197,46 +172,22 @@ class Route(models.Model, CoordMixin):
     ls = models.LineStringField(blank=True, null=True, srid=4326, dim=3, verbose_name='Маршрут')
     ls2 = models.LineStringField(blank=True, null=True, srid=4326, dim=2, verbose_name='2D-маршрут')
     rt_length = models.DecimalField(
-        blank=True,
-        null=True,
-        max_digits=5,
-        decimal_places=2,
-        verbose_name='Длина',
+        blank=True, null=True, max_digits=5, decimal_places=2, verbose_name='Длина',
     )
     rt_max_el = models.DecimalField(
-        blank=True,
-        null=True,
-        max_digits=6,
-        decimal_places=2,
-        verbose_name='Максимальная высота',
+        blank=True, null=True, max_digits=6, decimal_places=2, verbose_name='Максимальная высота',
     )
     rt_min_el = models.DecimalField(
-        blank=True,
-        null=True,
-        max_digits=6,
-        decimal_places=2,
-        verbose_name='Минимальная высота',
+        blank=True, null=True, max_digits=6, decimal_places=2, verbose_name='Минимальная высота',
     )
     rt_el_gain = models.DecimalField(
-        blank=True,
-        null=True,
-        max_digits=7,
-        decimal_places=2,
-        verbose_name='Набор высоты',
+        blank=True, null=True, max_digits=7, decimal_places=2, verbose_name='Набор высоты',
     )
     rt_el_loss = models.DecimalField(
-        blank=True,
-        null=True,
-        max_digits=7,
-        decimal_places=2,
-        verbose_name='Потеря высоты',
+        blank=True, null=True, max_digits=7, decimal_places=2, verbose_name='Потеря высоты',
     )
     rt_type = models.CharField(
-        max_length=1,
-        choices=status,
-        blank=True,
-        default='h',
-        verbose_name='Тип маршрута',
+        max_length=1, choices=status, blank=True, default='h', verbose_name='Тип маршрута',
     )
     rt_is_gpx = models.BooleanField(default=False, verbose_name='GPX?')
 
