@@ -50,6 +50,9 @@ class Profile(models.Model):
     def get_absolute_url(self):
         return reverse('user:profile', kwargs={'pk': self.id})
 
+    def get_ig_link(self):
+        return f'https://www.instagram.com/{self.instagram}/'
+
 
 @receiver(post_save, sender=User)
 def create_user_profile(sender, instance, created, **kwargs):

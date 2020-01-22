@@ -203,7 +203,7 @@ class ActionUserPlaceView(LoginRequiredMixin, RedirectView):
         place = Place.objects.get(pk=kwargs.get('pk'))
         action = kwargs.get('action')
         if place and action and action in self.action_dict:
-            profile = Profile.objects.get(pk=request.user.id)
+            profile = User.objects.get(pk=request.user.id).profile
             if action == 'like':
                 profile.like_place.add(place)
             elif action == 'unlike':
