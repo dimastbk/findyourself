@@ -17,9 +17,7 @@ from django.views.generic.edit import UpdateView
 
 from index.models import Place
 
-from .forms import (CustomPasswordChangeForm, LoginForm, ProfileForm,
-                    RegistrationForm, UserForm)
-from .models import Profile
+from .forms import CustomPasswordChangeForm, LoginForm, ProfileForm, RegistrationForm, UserForm
 
 
 class ProfileView(DetailView):
@@ -64,9 +62,9 @@ class UserFavorPlaceView(DetailView):
         if self.type_list == 'likes':
             context['place_list'] = profile_object.like_place.order_by('title').all()
         elif self.type_list == 'dones':
-            context['place_list'] = profile_object.done_place.all()
+            context['place_list'] = profile_object.done_place.order_by('title').all()
         elif self.type_list == 'wants':
-            context['place_list'] = profile_object.want_place.all()
+            context['place_list'] = profile_object.want_place.order_by('title').all()
 
         return context
 
@@ -169,8 +167,10 @@ class ProfileEditView(LoginRequiredMixin, SuccessMessageMixin, UpdateView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         self.object = self.get_object()
-        context['form'] = self.form_class(instance=self.object)
-        context['form2'] = self.form_class2(instance=self.object.profile)
+        if not context.get('form'):
+            context['form'] = self.form_class(instance=self.object)
+        if not context.get('form2'):
+            context['form2'] = self.form_class2(instance=self.object.profile)
         return context
 
     def post(self, request, *args, **kwargs):
@@ -184,7 +184,9 @@ class ProfileEditView(LoginRequiredMixin, SuccessMessageMixin, UpdateView):
             profile.user = user
             profile.save()
 
-        return self.form_valid(form)
+            return self.form_valid(form)
+
+        return self.render_to_response(self.get_context_data(form=form, form2=form2))
 
 
 class ActionUserPlaceView(LoginRequiredMixin, RedirectView):
@@ -217,11 +219,12 @@ class ActionUserPlaceView(LoginRequiredMixin, RedirectView):
             elif action == 'unwant':
                 profile.want_place.remove(place)
 
-            messages.success(request, 'Место «{0} {1}» {2}'.format(
-                place.type_place.title.lower(),
-                place.title,
-                self.action_dict[action],
-            ))
+            messages.success(
+                request,
+                'Место «{0} {1}» {2}'.format(
+                    place.type_place.title.lower(), place.title, self.action_dict[action],
+                ),
+            )
 
         if request.GET.get('next'):
             url = request.GET.get('next')

@@ -24,10 +24,7 @@ class IndexMapJsView(View):
         query['is_published'] = True
         qs = Place.objects.filter(**query).all()
         resp = serialize(
-            'geojson',
-            qs,
-            geometry_field='coord',
-            fields=('pk', 'title', 'type_place'),
+            'geojson', qs, geometry_field='coord', fields=('pk', 'title', 'type_place'),
         )
         return HttpResponse(f'var place_arr = {resp}', content_type='text/javascript')
 
@@ -47,8 +44,7 @@ class IndexMapPageView(FormView):
     def form_valid(self, form):
         context = self.get_context_data(**{'form': form})
         context['script_url'] = reverse(
-            'indexmap_js',
-            kwargs={k: v or 0 for k, v in form.data.items()},
+            'indexmap_js', kwargs={k: v or 0 for k, v in form.data.items()},
         )
         return self.render_to_response(context)
 
@@ -90,34 +86,30 @@ class PlaceDetailView(DetailView):
 
     def get_queryset(self):
         qs = super().get_queryset()
-        qs = qs.filter(
-            pk=self.kwargs['pk'], is_published=True,
-        ).select_related('city', 'type_place').prefetch_related('district', 'route_place')
+        qs = (
+            qs.filter(pk=self.kwargs['pk'], is_published=True,)
+            .select_related('city', 'type_place')
+            .prefetch_related('district', 'route_place')
+        )
         return qs
 
     def title_page(self):
         return '{0} ({1})'.format(
-            self.get_object().title,
-            self.get_object().type_place.title.lower(),
+            self.get_object().title, self.get_object().type_place.title.lower(),
         )
 
 
 class RouteDownloadView(LoginRequiredMixin, View):
-
     def get(self, request, *args, **kwargs):
         route = Route.objects.select_related('rt_from', 'rt_to').get(pk=self.kwargs['pk'])
         filename = slugify(route.rt_title)
         if self.kwargs['format'] == 'kml':
             response = HttpResponse(
-                makeoncekml(route),
-                content_type='application/vnd.google-earth.kml+xml',
+                makeoncekml(route), content_type='application/vnd.google-earth.kml+xml',
             )
             response['Content-Disposition'] = f'attachment; filename="{filename}.kml"'
         elif self.kwargs['format'] == 'gpx':
-            response = HttpResponse(
-                makeoncegpx(route),
-                content_type='application/gpx+xml',
-            )
+            response = HttpResponse(makeoncegpx(route), content_type='application/gpx+xml',)
             response['Content-Disposition'] = f'attachment; filename="{filename}.gpx"'
         else:
             response = HttpResponseBadRequest()
@@ -125,23 +117,20 @@ class RouteDownloadView(LoginRequiredMixin, View):
 
 
 class PlaceAllRouteDownloadView(LoginRequiredMixin, View):
-
     def get(self, request, *args, **kwargs):
-        routes = Place.objects.filter(
-            pk=self.kwargs['pk'], is_published=True,
-        ).prefetch_related('route_place').first()
+        routes = (
+            Place.objects.filter(pk=self.kwargs['pk'], is_published=True,)
+            .prefetch_related('route_place')
+            .first()
+        )
         filename = slugify(routes.title)
         if self.kwargs['format'] == 'kml':
             response = HttpResponse(
-                makeallkml(routes),
-                content_type='application/vnd.google-earth.kml+xml',
+                makeallkml(routes), content_type='application/vnd.google-earth.kml+xml',
             )
             response['Content-Disposition'] = f'attachment; filename="{filename}.kml"'
         elif self.kwargs['format'] == 'gpx':
-            response = HttpResponse(
-                makeallgpx(routes),
-                content_type='application/gpx+xml',
-            )
+            response = HttpResponse(makeallgpx(routes), content_type='application/gpx+xml',)
             response['Content-Disposition'] = f'attachment; filename="{filename}.gpx"'
         else:
             response = HttpResponseBadRequest()
@@ -185,7 +174,6 @@ class RouteCreateView(RouteCreateEditMixin, CreateView):
 
 
 class RouteCreatePkView(RouteCreateView, CreateView):
-
     def get_initial(self):
         initial = super().get_initial()
         initial.update(rt_to=self.kwargs.get('pk', ''))

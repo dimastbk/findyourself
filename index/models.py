@@ -212,7 +212,7 @@ class Route(models.Model, CoordMixin):
         if self.rt_is_gpx and hasattr(self, 'coords'):
             ls = LineString(self.coords, srid=4326)
             # уменьшаем количество точек в треке
-            # вероятно, нужно это делать до подсчёта высоты и длины, ибо данные получаются неверными 
+            # вероятно, нужно это делать до подсчёта высоты и длины, ибо данные получаются неверными
             ls = ls.simplify(tolerance=0.00001)
             # если высота отсутствует, то копируем в 2D и убираем флаг GPX
             if not ls.hasz:
@@ -230,10 +230,7 @@ class Route(models.Model, CoordMixin):
 
         # иначе забиваем ls2, убирая высоту (нужно для виджета leaflet)
         else:
-            self.ls2 = LineString(
-                [(p[0], p[1]) for p in ls.coords],
-                srid=4326,
-            )
+            self.ls2 = LineString([(p[0], p[1]) for p in ls.coords], srid=4326,)
 
         # если есть линия, то начинаем считать высоты и потери
         if ls:

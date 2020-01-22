@@ -22,10 +22,7 @@ class Profile(models.Model):
     )
     instagram = models.CharField(max_length=50, blank=True)
     like_place = models.ManyToManyField(
-        Place,
-        verbose_name='Избранное',
-        db_table='like_user_place',
-        related_name='like_place',
+        Place, verbose_name='Избранное', db_table='like_user_place', related_name='like_place',
     )
     done_place = models.ManyToManyField(
         Place,

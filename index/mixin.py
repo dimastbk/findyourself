@@ -47,6 +47,7 @@ class CssClassFormMixin:
     additional_css_class = ''
 
     def __init__(self, *args, **kwargs):
+        # Добавляем default_css_class и additional_css_class для всех виджетов
         super().__init__(*args, **kwargs)
         for field in self.fields.values():
             field_attrs = field.widget.attrs
@@ -61,6 +62,7 @@ class CssClassFormMixin:
             )
 
     def is_valid(self):
+        # Добавляет invalid_css_class для полей, не прощедших валидацию
         for f in self.errors:
             if f != '__all__':
                 field_attrs = self.fields[f].widget.attrs

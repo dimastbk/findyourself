@@ -1,9 +1,16 @@
 from django.urls import path
 
-from .views import (CurrentProfileView, CurrentUserFavorPlaceView,
-                    CustomLoginView, CustomPasswordChangeView, LogoutView,
-                    ProfileEditView, ProfileView, RegistrationView,
-                    UserFavorPlaceView)
+from .views import (
+    CurrentProfileView,
+    CurrentUserFavorPlaceView,
+    CustomLoginView,
+    CustomPasswordChangeView,
+    LogoutView,
+    ProfileEditView,
+    ProfileView,
+    RegistrationView,
+    UserFavorPlaceView,
+)
 
 app_name = 'user'
 
@@ -12,9 +19,7 @@ urlpatterns = [
     path('logout/', LogoutView.as_view(), name='logout'),
     path('registration/', RegistrationView.as_view(), name='registration'),
     path(
-        '<int:pk>/place/<slug:type_list>/',
-        UserFavorPlaceView.as_view(),
-        name='user_favor_place',
+        '<int:pk>/place/<slug:type_list>/', UserFavorPlaceView.as_view(), name='user_favor_place',
     ),
     path(
         'place/<slug:type_list>/',
