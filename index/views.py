@@ -44,7 +44,7 @@ class IndexMapPageView(FormView):
     def form_valid(self, form):
         context = self.get_context_data(**{'form': form})
         context['script_url'] = reverse(
-            'indexmap_js', kwargs={k: v or 0 for k, v in form.data.items()},
+            'index:indexmap_js', kwargs={k: v or 0 for k, v in form.data.items()},
         )
         return self.render_to_response(context)
 
@@ -144,7 +144,7 @@ class PlaceCreateEditMixin(LoginRequiredMixin):
 
     def get_success_url(self):
         if '_addroute' in self.request.POST:
-            return reverse('route_create_pk', kwargs={'pk': self.object.pk})
+            return reverse('index:route_create_pk', kwargs={'pk': self.object.pk})
 
         return super().get_success_url()
 
@@ -164,7 +164,7 @@ class RouteCreateEditMixin(LoginRequiredMixin):
 
     def get_success_url(self):
         if '_addnext' in self.request.POST:
-            return reverse('route_create')
+            return reverse('index:route_create')
 
         return super().get_success_url()
 

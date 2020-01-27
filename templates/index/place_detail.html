@@ -16,18 +16,18 @@
           </div>
           <div>
             {% if place in user.profile.like_place.all %}
-              <a href="{% url 'action_user_place' place.id 'unlike' %}" class="btn btn-outline-danger mki-grande" title="Удалить из избранного">&#xe08c;</a>
+              <a href="{% url 'user:action_user_place' place.id 'unlike' %}" class="btn btn-outline-danger mki-grande" title="Удалить из избранного">&#xe08c;</a>
             {% else %}
-              <a href="{% url 'action_user_place' place.id 'like' %}" class="btn btn-outline-secondary mki-grande" title="Добавить в избранное">&#xe08c;</a>
+              <a href="{% url 'user:action_user_place' place.id 'like' %}" class="btn btn-outline-secondary mki-grande" title="Добавить в избранное">&#xe08c;</a>
             {% endif %}
             {% if place in user.profile.done_place.all %}
-              <a href="{% url 'action_user_place' place.id 'undone' %}" class="btn btn-outline-success mki-grande" title="Снять отметку о посещении">✔</a>
+              <a href="{% url 'user:action_user_place' place.id 'undone' %}" class="btn btn-outline-success mki-grande" title="Снять отметку о посещении">✔</a>
             {% else %}
-              <a href="{% url 'action_user_place' place.id 'done' %}" class="btn btn-outline-secondary mki-grande" title="Отметить посещённым">✔</a>
+              <a href="{% url 'user:action_user_place' place.id 'done' %}" class="btn btn-outline-secondary mki-grande" title="Отметить посещённым">✔</a>
               {% if place in user.profile.want_place.all %}
-                <a href="{% url 'action_user_place' place.id 'unwant' %}" class="btn btn-outline-warning mki-grande" title="Убрать из хотелок">&#xe07a;</a>
+                <a href="{% url 'user:action_user_place' place.id 'unwant' %}" class="btn btn-outline-warning mki-grande" title="Убрать из хотелок">&#xe07a;</a>
               {% else %}
-                <a href="{% url 'action_user_place' place.id 'want' %}" class="btn btn-outline-secondary mki-grande" title="Хочу посетить">&#xe07a;</a>
+                <a href="{% url 'user:action_user_place' place.id 'want' %}" class="btn btn-outline-secondary mki-grande" title="Хочу посетить">&#xe07a;</a>
               {% endif %}
             {% endif %}
           </div>
@@ -63,7 +63,7 @@
               <div class="flex-fill small text-muted">Теги: {% for tag in place.tags.all %}<a href="#" class="">{{ tag }}</a> {% endfor %}</div>
             {% endif %}
             {% if user.is_superuser %}
-              <div class="flex-fill small text-right" ><a class="text-muted" href="{% url 'place_edit' place.pk %}">Редактировать</a></div>
+              <div class="flex-fill small text-right" ><a class="text-muted" href="{% url 'index:place_edit' place.pk %}">Редактировать</a></div>
             {% endif %}
           </div>
         {% endif %}
@@ -134,17 +134,17 @@
       <td>{{ route.rt_length }} км</td>
       <td>{{ route.rt_min_el }} / {{ route.rt_max_el }}</td>
       <td>+{{ route.rt_el_gain}} / -{{ route.rt_el_loss}}</td>
-      <td><a href="{% url 'route_get' route.pk 'gpx' %}">GPX</a>, <a href="{% url 'route_get' route.pk 'kml' %}">KML</a></td>
+      <td><a href="{% url 'index:route_get' route.pk 'gpx' %}">GPX</a>, <a href="{% url 'index:route_get' route.pk 'kml' %}">KML</a></td>
     </tr>
   {% endfor %}
   </tbody>
   <tfoot>
     <tr class="text-center">
-      <td colspan="3" class="text-left"><a href="{% url 'route_create_pk' place.pk %}">Добавить</a></td>
+      <td colspan="3" class="text-left"><a href="{% url 'index:route_create_pk' place.pk %}">Добавить</a></td>
       <td></td>
       <td></td>
       <td><b>Скачать все</b></td>
-      <td><a href="{% url 'place_allroute_get' place.pk 'gpx' %}">GPX</a>, <a href="{% url 'place_allroute_get' place.pk 'kml' %}">KML</a></td>
+      <td><a href="{% url 'index:place_allroute_get' place.pk 'gpx' %}">GPX</a>, <a href="{% url 'index:place_allroute_get' place.pk 'kml' %}">KML</a></td>
     </tr>
   </tfoot>
 </table>

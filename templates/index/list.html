@@ -4,7 +4,7 @@
 {% load static %}
 
 {% block content %}
-  <form class="form-row" action="{% url 'indexlist' %}" method="POST">
+  <form class="form-row" action="{% url 'index:indexlist' %}" method="POST">
     {% for field in form %}
       <div class="col-12 col-lg-3 my-2">
           {{ field }}

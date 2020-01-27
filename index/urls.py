@@ -1,7 +1,5 @@
 from django.urls import path
 
-from user.views import ActionUserPlaceView
-
 from .views import (
     IndexListPageView,
     IndexMapJsView,
@@ -17,6 +15,8 @@ from .views import (
     RouteEditView,
 )
 
+app_name = 'index'
+
 urlpatterns = [
     path('route/<int:pk>/get/<format>/', RouteDownloadView.as_view(), name='route_get'),
     path('route/<int:pk>/edit/', RouteEditView.as_view(), name='route_edit'),
@@ -28,7 +28,6 @@ urlpatterns = [
         name='place_allroute_get',
     ),
     path('place/<int:pk>/edit/', PlaceEditView.as_view(), name='place_edit'),
-    path('place/<int:pk>/<slug:action>/', ActionUserPlaceView.as_view(), name='action_user_place'),
     path('place/<int:pk>/', PlaceDetailView.as_view(), name='place'),
     path('place/create/', PlaceCreateView.as_view(), name='place_create'),
     path(

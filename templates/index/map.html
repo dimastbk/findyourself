@@ -27,7 +27,7 @@
   {% if script_url %}
     <script src="{{ script_url }}" type="text/javascript"></script>
   {% else %}
-    <script src="{% url 'indexmap_js' 0 0 0 %}" type="text/javascript"></script>
+    <script src="{% url 'index:indexmap_js' 0 0 0 %}" type="text/javascript"></script>
   {% endif %}
   <script type="text/javascript">
     window.addEventListener("map:init", function (e) {

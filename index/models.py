@@ -69,7 +69,7 @@ class Place(models.Model, CoordMixin):
         return self.title
 
     def get_absolute_url(self):
-        return reverse('place', kwargs={'pk': self.id})
+        return reverse('index:place', kwargs={'pk': self.id})
 
     def get_ig_link(self):
         if self.ig_id:
@@ -199,7 +199,7 @@ class Route(models.Model, CoordMixin):
         return f'{self.rt_from} - {self.rt_to}'
 
     def get_absolute_url(self):
-        return reverse('place', kwargs={'pk': self.rt_to.pk})
+        return reverse('index:place', kwargs={'pk': self.rt_to.pk})
 
     def save(self, *args, **kwargs):
         elevation_data = srtm.get_data()
@@ -226,11 +226,11 @@ class Route(models.Model, CoordMixin):
                 el = elevation_data.get_elevation(p[1], p[0])
                 coord_list.append((p[0], p[1], el))
 
-                ls = LineString(coord_list, srid=4326)
+            ls = LineString(coord_list, srid=4326)
 
         # иначе забиваем ls2, убирая высоту (нужно для виджета leaflet)
         else:
-            self.ls2 = LineString([(p[0], p[1]) for p in ls.coords], srid=4326,)
+            self.ls2 = LineString([(p[0], p[1]) for p in ls.coords], srid=4326)
 
         # если есть линия, то начинаем считать высоты и потери
         if ls:

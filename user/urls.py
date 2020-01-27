@@ -1,6 +1,7 @@
 from django.urls import path
 
 from .views import (
+    ActionUserPlaceView,
     CurrentProfileView,
     CurrentUserFavorPlaceView,
     CustomLoginView,
@@ -26,6 +27,7 @@ urlpatterns = [
         CurrentUserFavorPlaceView.as_view(),
         name='current_user_favor_place',
     ),
+    path('place/<int:pk>/<slug:action>/', ActionUserPlaceView.as_view(), name='action_user_place'),
     path('<int:pk>/profile/', ProfileView.as_view(), name='profile'),
     path('profile/edit/', ProfileEditView.as_view(), name='edit_profile'),
     path('profile/', CurrentProfileView.as_view(), name='current_profile'),
