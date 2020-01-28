@@ -4,11 +4,11 @@ import json
 class CoordMixin:
     @property
     def get_coord(self):
-        # прямые координаты, используются в KML
+        # прямые координаты
         if getattr(self, 'coord', False):
             return [(self.coord.x, self.coord.y)]
         elif getattr(self, 'ls', False):
-            return [(i[0], i[1]) for i in self.ls.coords]
+            return [(round(i[0], 5), round(i[1], 5)) for i in self.ls.coords]
         return ''
 
     @property

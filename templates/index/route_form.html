@@ -16,20 +16,41 @@
       <form method="POST" enctype="multipart/form-data">
         {% csrf_token %}
         {% for field in form %}
-          <div class="form-group">
-            <label for="{{ field.id_for_label }}">{{ field.label }}</label>
-            {{ field }}
-            {% if field.help_text %}
-              <small id="{{ field.id_for_label }}HelpBlock" class="form-text text-muted">
-                {{ field.help_text|safe }}
-              </small>
-            {% endif %}
-            {% if field.errors %}
-              <div class="invalid-feedback">
-              {{ field.errors }}
+          {% if not field.is_hidden %}
+            {% if field.field.widget.input_type == 'checkbox' %}
+              <div class="form-check">
+                <input class="form-check-input" type="checkbox" {% if field.value %}checked{% endif %} id="{{ field.id_for_label }}" name="{{ field.name }}">
+                <label class="form-check-label" for="{{ field.id_for_label }}">{{ field.label }}</label>
+                {% if field.help_text %}
+                  <small id="{{ field.id_for_label }}HelpBlock" class="form-text text-muted">
+                    {{ field.help_text|safe }}
+                  </small>
+                {% endif %}
+                {% if field.errors %}
+                  <div class="invalid-feedback">
+                    {{ field.errors }}
+                  </div>
+                {% endif %}
+              </div>
+            {% else %}
+              <div class="form-group">
+                <label for="{{ field.id_for_label }}">{{ field.label }}</label>
+                {{ field }}
+                {% if field.help_text %}
+                  <small id="{{ field.id_for_label }}HelpBlock" class="form-text text-muted">
+                    {{ field.help_text|safe }}
+                  </small>
+                {% endif %}
+                {% if field.errors %}
+                  <div class="invalid-feedback">
+                    {{ field.errors }}
+                  </div>
+                {% endif %}
               </div>
             {% endif %}
-          </div>
+          {% else %}
+            {{ field }}
+          {% endif %}
         {% endfor %}
         <div class="d-flex justify-content-around">
           <button class="btn btn-secondary" type="submit" name="_addnext">Сохранить и добавить ещё</button>

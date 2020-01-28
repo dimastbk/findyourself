@@ -206,32 +206,40 @@ class Route(models.Model, CoordMixin):
         max_el, min_el, el_gain, el_loss, el, last_el = 0, 9999, 0, 0, 0, None
         coord_list, ls = [], False
 
+        gpx_fix_el = self.gpx_fix_el if hasattr(self, 'gpx_fix_el') else False
+
         # todo: возможно, есть разные случаи, нужно больше тестов
 
         # если gpx (ставится в обработчике формы), то проверяем наличие высоты
         if self.rt_is_gpx:
-            if hasattr(self, 'coords'):
+            if self.coords:
                 ls = LineString(self.coords, srid=4326)
                 # уменьшаем количество точек в треке
                 # вероятно, нужно это делать до подсчёта высоты и длины,
                 # ибо данные получаются неверными
                 ls = ls.simplify(tolerance=0.00001)
-                # если высота отсутствует, то копируем в 2D и убираем флаг GPX
-                if not ls.hasz:
+
+                # высоты нет, то забиваем ls2, убирая высоту (нужно для виджета leaflet)
+                if ls.hasz:
+                    self.ls2 = LineString([(p[0], p[1]) for p in ls.coords], srid=4326)
+
+                # если высота отсутствует, то копируем в 2D
+                else:
                     self.ls2 = ls
                     self.rt_is_gpx = False
 
-            if self.ls2:
-                for p in self.ls2.coords:
-                    # Добавляем высоту
-                    el = elevation_data.get_elevation(p[1], p[0])
-                    coord_list.append((p[0], p[1], el))
+        if gpx_fix_el:
+            self.rt_is_gpx = False
 
-                ls = LineString(coord_list, srid=4326)
+        # если есть плоские коордиинаты (или требуется почиинить высоту в треке),
+        # то считаем высоту из SRTM
+        if self.ls2 and (gpx_fix_el or not self.rt_is_gpx):
+            for p in self.ls2.coords:
+                # Добавляем высоту
+                el = elevation_data.get_elevation(p[1], p[0])
+                coord_list.append((p[0], p[1], el))
 
-            # иначе забиваем ls2, убирая высоту (нужно для виджета leaflet)
-            elif ls:
-                self.ls2 = LineString([(p[0], p[1]) for p in ls.coords], srid=4326)
+            ls = LineString(coord_list, srid=4326)
 
         # если есть линия, то начинаем считать высоты и потери
         if ls:

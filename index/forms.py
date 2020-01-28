@@ -52,8 +52,14 @@ class PlaceForm(CssClassFormMixin, forms.ModelForm):
 
 
 class RouteForm(CssClassFormMixin, forms.ModelForm):
-
     gpx_file = forms.FileField(required=False, label='Трек в формате GPX')
+    gpx_fix_el = forms.BooleanField(
+        required=False,
+        initial=False,
+        label='Исправить высоту в треке?',
+        help_text='Отметьте, чтобы заменить высоту в треке на данные'
+        + ' <a href="https://ru.wikipedia.org/wiki/SRTM">SRTM</a>.',
+    )
 
     class Meta:
         model = Route
@@ -63,10 +69,17 @@ class RouteForm(CssClassFormMixin, forms.ModelForm):
             'rt_from',
             'rt_to',
             'ls2',
+            'rt_is_gpx',
         )
         widgets = {
             'ls2': LeafletWidget(),
+            'rt_is_gpx': forms.HiddenInput(),
         }
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        if self.is_bound and not self.initial.get('rt_is_gpx'):
+            self.fields['gpx_fix_el'].widget = forms.HiddenInput()
 
     def clean_gpx_file(self):
         gpx_file = self.cleaned_data.get('gpx_file')
@@ -85,11 +98,11 @@ class RouteForm(CssClassFormMixin, forms.ModelForm):
 
     def save(self, commit=True):
         route = super().save(commit=False)
-        gpx_coord = self.cleaned_data.get('gpx_file')
 
-        if gpx_coord:
-            route.rt_is_gpx = True
-            route.coords = gpx_coord
+        route.coords = self.cleaned_data.get('gpx_file')
+
+        route.rt_is_gpx = True if route.coords else self.initial.get('rt_is_gpx', False)
+        route.gpx_fix_el = self.cleaned_data.get('gpx_fix_el')
 
         if commit:
             route.save()
