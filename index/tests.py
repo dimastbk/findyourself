@@ -4,10 +4,9 @@ from django.test import TestCase
 from django.test.client import Client
 from django.urls import reverse
 
-from findyourhappiness.settings import BASE_DIR
-
 from faker import Faker
 
+from findyourhappiness.settings import BASE_DIR
 from index.models import City, Place, Route, Type
 
 fake = Faker()
@@ -24,7 +23,9 @@ class SpecialUserPageReverseTestCase(TestCase):
         User.objects.create(username=fake_name, email=fake_email)
         City.objects.create(title=fake_placename)
         type_place = Type.objects.create(title=fake_placename)
-        self.place = Place.objects.create(title=fake_placename, is_published=True, type_place=type_place)
+        self.place = Place.objects.create(
+            title=fake_placename, is_published=True, type_place=type_place
+        )
 
         self.c = Client()
 
@@ -36,12 +37,21 @@ class SpecialUserPageReverseTestCase(TestCase):
 
     def test_anon_placepage_code(self):
         # Проверяем доступность страниц мест анониму
-        self.assertEqual(self.c.get(reverse('index:place', kwargs={'pk': self.place.id})).status_code, 200)
-        self.assertEqual(self.c.get(reverse('index:place_edit', kwargs={'pk': self.place.id})).status_code, 302)
+        self.assertEqual(
+            self.c.get(reverse('index:place', kwargs={'pk': self.place.id})).status_code, 200
+        )
+        self.assertEqual(
+            self.c.get(reverse('index:place_edit', kwargs={'pk': self.place.id})).status_code, 302
+        )
         self.assertEqual(self.c.get(reverse('index:place_create')).status_code, 302)
-        self.assertEqual(self.c.get(reverse('index:route_edit', kwargs={'pk': self.place.id})).status_code, 302)
+        self.assertEqual(
+            self.c.get(reverse('index:route_edit', kwargs={'pk': self.place.id})).status_code, 302
+        )
         self.assertEqual(self.c.get(reverse('index:route_create')).status_code, 302)
-        self.assertEqual(self.c.get(reverse('index:route_create_pk', kwargs={'pk': self.place.id})).status_code, 302)
+        self.assertEqual(
+            self.c.get(reverse('index:route_create_pk', kwargs={'pk': self.place.id})).status_code,
+            302,
+        )
 
     def test_route_create(self):
         # Проверяем создание маршрутов

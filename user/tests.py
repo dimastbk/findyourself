@@ -168,7 +168,9 @@ class UserLikesTestCase(TestCase):
         user = User.objects.get(username=fake_name)
         place = Place.objects.get(title=fake_placename)
         self.assertRedirects(
-            self.c.get(reverse('user:action_user_place', kwargs={'pk': place.id, 'action': 'like'})),
+            self.c.get(
+                reverse('user:action_user_place', kwargs={'pk': place.id, 'action': 'like'})
+            ),
             reverse('index:place', kwargs={'pk': place.id}),
         )
         self.assertContains(
@@ -178,7 +180,9 @@ class UserLikesTestCase(TestCase):
             fake_placename,
         )
         self.assertRedirects(
-            self.c.get(reverse('user:action_user_place', kwargs={'pk': place.id, 'action': 'unlike'})),
+            self.c.get(
+                reverse('user:action_user_place', kwargs={'pk': place.id, 'action': 'unlike'})
+            ),
             reverse('index:place', kwargs={'pk': place.id}),
         )
         self.assertNotContains(

@@ -10,9 +10,10 @@ env:
 - DJANGO_DATABASE_TEST=postgres
 
 before_install:
-  - sudo apt-get install gdal-bin libproj-dev libsqlite3-mod-spatialite postgresql-12-postgis-3 -y
-  - sudo cp /etc/postgresql/{10,12}/main/pg_hba.conf
-  - sudo systemctl restart postgresql@12-main
+  - sudo apt-get install gdal-bin libproj-dev libsqlite3-mod-spatialite -y
+  - if [[ $DJANGO_DATABASE_TEST == postgres ]]; then sudo apt-get install -y postgresql-12-postgis-3; fi
+  - if [[ $DJANGO_DATABASE_TEST == postgres ]]; then sudo cp /etc/postgresql/{10,12}/main/pg_hba.conf; fi
+  - if [[ $DJANGO_DATABASE_TEST == postgres ]]; then sudo systemctl restart postgresql@12-main; fi
   - pip freeze | xargs pip uninstall -y
   - curl -sSL https://raw.githubusercontent.com/sdispater/poetry/master/get-poetry.py | python
   - source "$HOME/.poetry/env"
