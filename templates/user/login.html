@@ -3,23 +3,12 @@
 {% block content %}
 <div class="row">
   <div class="col-12 col-lg-6 offset-lg-3 mt-5">
-    {% if form.non_field_errors %}
-      <div class="alert alert-danger">
-        {% for error in form.non_field_errors %}
-            {{ error }}
-        {% endfor %}
-      </div>
-    {% endif %}
+    {% include "components/form_errors.html" %}
     <form method="POST">
       {% csrf_token %}
-      <div class="form-group">
-        <label for="{{ form.username.id_for_label }}">{{ form.username.label }}</label>
-        {{ form.username }}
-      </div>
-      <div class="form-group">
-        <label for="{{ form.password.id_for_label }}">{{ form.password.label }}</label>
-        {{ form.password }}
-      </div>
+      {% for field in form %}
+        {% include "components/form_field.html" %}
+      {% endfor %}
       <button class="btn btn-primary" type="submit">Войти</button>
     </form>
   </div>

@@ -1,0 +1,35 @@
+          {% if not field.is_hidden %}
+            {% if field.field.widget.input_type == 'checkbox' %}
+              <div class="form-check {% if field.field.required %}form-required{% endif %}">
+                <input class="form-check-input" type="checkbox" {% if field.value %}checked{% endif %} id="{{ field.id_for_label }}" name="{{ field.name }}">
+                <label class="form-check-label" for="{{ field.id_for_label }}">{{ field.label }}</label>
+                {% if field.help_text %}
+                  <small id="{{ field.id_for_label }}HelpBlock" class="form-text text-muted">
+                    {{ field.help_text|safe }}
+                  </small>
+                {% endif %}
+                {% if field.errors %}
+                  <div class="invalid-feedback">
+                    {{ field.errors }}
+                  </div>
+                {% endif %}
+              </div>
+            {% else %}
+              <div class="form-group {% if field.field.required %}form-required{% endif %}">
+                <label for="{{ field.id_for_label }}">{{ field.label }}</label>
+                {{ field }}
+                {% if field.help_text %}
+                  <small id="{{ field.id_for_label }}HelpBlock" class="form-text text-muted">
+                    {{ field.help_text|safe }}
+                  </small>
+                {% endif %}
+                {% if field.errors %}
+                  <div class="invalid-feedback">
+                    {{ field.errors }}
+                  </div>
+                {% endif %}
+              </div>
+            {% endif %}
+          {% else %}
+            {{ field }}
+          {% endif %}

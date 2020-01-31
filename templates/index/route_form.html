@@ -6,51 +6,11 @@
   <div class="h4 mt-3 mb-1">{{ view.title_page }}</div>
   <div class="row mb-4">
     <div class="col-12 col-lg-6 offset-lg-3">
-      {% if form.non_field_errors %}
-        <div class="alert alert-danger">
-          {% for error in form.non_field_errors %}
-              {{ error }}
-          {% endfor %}
-        </div>
-      {% endif %}
+      {% include "components/form_errors.html" %}
       <form method="POST" enctype="multipart/form-data">
         {% csrf_token %}
         {% for field in form %}
-          {% if not field.is_hidden %}
-            {% if field.field.widget.input_type == 'checkbox' %}
-              <div class="form-check">
-                <input class="form-check-input" type="checkbox" {% if field.value %}checked{% endif %} id="{{ field.id_for_label }}" name="{{ field.name }}">
-                <label class="form-check-label" for="{{ field.id_for_label }}">{{ field.label }}</label>
-                {% if field.help_text %}
-                  <small id="{{ field.id_for_label }}HelpBlock" class="form-text text-muted">
-                    {{ field.help_text|safe }}
-                  </small>
-                {% endif %}
-                {% if field.errors %}
-                  <div class="invalid-feedback">
-                    {{ field.errors }}
-                  </div>
-                {% endif %}
-              </div>
-            {% else %}
-              <div class="form-group">
-                <label for="{{ field.id_for_label }}">{{ field.label }}</label>
-                {{ field }}
-                {% if field.help_text %}
-                  <small id="{{ field.id_for_label }}HelpBlock" class="form-text text-muted">
-                    {{ field.help_text|safe }}
-                  </small>
-                {% endif %}
-                {% if field.errors %}
-                  <div class="invalid-feedback">
-                    {{ field.errors }}
-                  </div>
-                {% endif %}
-              </div>
-            {% endif %}
-          {% else %}
-            {{ field }}
-          {% endif %}
+          {% include "components/form_field.html" %}
         {% endfor %}
         <div class="d-flex justify-content-around">
           <button class="btn btn-secondary" type="submit" name="_addnext">Сохранить и добавить ещё</button>

@@ -3,46 +3,14 @@
 {% block content %}
 <div class="row">
   <div class="col-12 col-lg-6 offset-lg-3 mt-5">
-    {% if form.non_field_errors %}
-      <div class="alert alert-danger">
-        {% for error in form.non_field_errors %}
-            {{ error }}
-        {% endfor %}
-      </div>
-    {% endif %}
+    {% include "components/form_errors.html" %}
     <form method="POST">
       {% csrf_token %}
       {% for field in form %}
-        <div class="form-group">
-          <label for="{{ field.id_for_label }}">{{ field.label }}</label>
-          {{ field }}
-          {% if field.help_text %}
-            <small id="{{ field.id_for_label }}HelpBlock" class="form-text text-muted">
-              {{ field.help_text }}
-            </small>
-          {% endif %}
-          {% if field.errors %}
-            <div class="invalid-feedback">
-            {{ field.errors }}
-            </div>
-          {% endif %}
-        </div>
+        {% include "components/form_field.html" %}
       {% endfor %}
       {% for field in form2 %}
-        <div class="form-group">
-          <label for="{{ field.id_for_label }}">{{ field.label }}</label>
-          {{ field }}
-          {% if field.help_text %}
-            <small id="{{ field.id_for_label }}HelpBlock" class="form-text text-muted">
-              {{ field.help_text }}
-            </small>
-          {% endif %}
-          {% if field.errors %}
-            <div class="invalid-feedback">
-            {{ field.errors }}
-            </div>
-          {% endif %}
-        </div>
+        {% include "components/form_field.html" %}
       {% endfor %}
       <div class="d-flex justify-content-around">
       <button class="btn btn-success " type="submit">Сохранить профиль</button>
