@@ -170,7 +170,7 @@
             coord_city = {{ place.city.get_jsoncoord }},
             map = e.detail.map.fitBounds([ coord_place, coord_city  ]);
         {% if user.is_authenticated %}
-          json = fetch('http://127.0.0.1:5000/route/v1/driving/{{ place.city.get_coord.0.0|unlocalize }},{{ place.city.get_coord.0.1|unlocalize }};{{ user.profile.city.get_coord.0.0|unlocalize }},{{ user.profile.city.get_coord.0.1|unlocalize }}?geometries=geojson&overview=full')
+          json = fetch('{{ osrm_server }}/route/v1/driving/{{ place.city.get_coord.0.0|unlocalize }},{{ place.city.get_coord.0.1|unlocalize }};{{ user.profile.city.get_coord.0.0|unlocalize }},{{ user.profile.city.get_coord.0.1|unlocalize }}?geometries=geojson&overview=full')
           .then(response => response.json())
           .then(data => data['routes'][0])
           .then(data => L.polyline(

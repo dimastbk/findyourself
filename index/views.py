@@ -1,3 +1,4 @@
+from django.conf import settings
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.core.serializers import serialize
 from django.http import HttpResponse, HttpResponseBadRequest
@@ -84,10 +85,15 @@ class PlaceDetailView(DetailView):
 
     model = Place
 
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['osrm_server'] = settings.OSRM_SERVER
+        return context
+
     def get_queryset(self):
         qs = super().get_queryset()
         qs = (
-            qs.filter(pk=self.kwargs['pk'], is_published=True,)
+            qs.filter(pk=self.kwargs['pk'], is_published=True)
             .select_related('city', 'type_place')
             .prefetch_related('district', 'route_place')
         )
@@ -109,7 +115,7 @@ class RouteDownloadView(LoginRequiredMixin, View):
             )
             response['Content-Disposition'] = f'attachment; filename="{filename}.kml"'
         elif self.kwargs['format'] == 'gpx':
-            response = HttpResponse(makeoncegpx(route), content_type='application/gpx+xml',)
+            response = HttpResponse(makeoncegpx(route), content_type='application/gpx+xml')
             response['Content-Disposition'] = f'attachment; filename="{filename}.gpx"'
         else:
             response = HttpResponseBadRequest()
@@ -119,7 +125,7 @@ class RouteDownloadView(LoginRequiredMixin, View):
 class PlaceAllRouteDownloadView(LoginRequiredMixin, View):
     def get(self, request, *args, **kwargs):
         routes = (
-            Place.objects.filter(pk=self.kwargs['pk'], is_published=True,)
+            Place.objects.filter(pk=self.kwargs['pk'], is_published=True)
             .prefetch_related('route_place')
             .first()
         )
@@ -130,7 +136,7 @@ class PlaceAllRouteDownloadView(LoginRequiredMixin, View):
             )
             response['Content-Disposition'] = f'attachment; filename="{filename}.kml"'
         elif self.kwargs['format'] == 'gpx':
-            response = HttpResponse(makeallgpx(routes), content_type='application/gpx+xml',)
+            response = HttpResponse(makeallgpx(routes), content_type='application/gpx+xml')
             response['Content-Disposition'] = f'attachment; filename="{filename}.gpx"'
         else:
             response = HttpResponseBadRequest()
