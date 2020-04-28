@@ -21,7 +21,7 @@ before_install:
   - cp findyourhappiness/local_settings.py.template findyourhappiness/local_settings.py
 
 install: 
-  - poetry install
+  - poetry install --no-root
 
 script: 
   - make lint
@@ -30,3 +30,14 @@ script:
 after_success:
   - pip install coveralls
   - coveralls
+
+notifications:
+  webhooks:
+    urls:       https://gototy.ga/hooks/deploy
+    on_success: always
+    on_failure: never
+    on_start:   never
+    on_cancel:  never
+    on_error:   never
+    secret:
+      secure: ZMvcQ47khy0yOKeJSkeQs+58qSN/5Y04owE84rvknWNGwRBkrGNe/vcZ1DTdHc3ZZYXqJ6kQBfruhs3KC7GfuOfLDGE4O68I6Cg7glbmk7DlfzEkrnaowLdW+EPruOeG3Q0j45l9B+NV+XUog5l/EFAYCNN1lwPlRZVeMwC69QLEfW5nYldCzDcZJvtE8mGIkNhZ8us7ZjC28iFMKu1kFiOZZLLOFPsMR3bUOmv/7ztLHMj6yo5Jl7HSum3WrdRxvQOzPI4bJxhahpyY6yrJxKy/PpOzNR6XvW9AE4cDNLltVaOA8C2WAjdF5b7jX6u0dlUs7rwORcSbi5s5nc99H2XnmIoxsq33/lfw9YSzPb7Gky+tkj1O9z7updfz3AQDEYCQsAsgWqG1UTWMg5yDmdRmEUsQfporn2ZwTc99T4R2cpSRBoNGjd9zJKlHbbTfFBmgnovEETGmb2yCt0TpGKMHFQoAdnZhN5tEPY5Fs/YN7WuD9EAyv5dt4auDZclzzrDcj2zl9AVyNRvIOgM3fF7U2QVz+V8tMw5R1lqTR4xTKwTifcHx6MCX38YK8v7oOmrCXU1KWtSE5GIBEen6kJRdaOqJQsmR/9JbuKOQBQP29wVQv2uCj3tb9V28lYBjeBLexlERzIbPbFy15r4hyvc4RBksM7wstHhsT/Tfkkw=
