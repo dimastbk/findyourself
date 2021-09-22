@@ -20,7 +20,7 @@ authors = ["Дмитрий <dimastbk@yandex.ru>"]
 
 [tool.poetry.dependencies]
 python = "3.7.*"
-Django = "^3.0"
+Django = "^3.1"
 django-taggit = "^1.2"
 Pillow = "^6.2"
 django-imagefield = "^0.8.5"
